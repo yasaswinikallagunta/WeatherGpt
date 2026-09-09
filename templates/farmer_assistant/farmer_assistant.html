@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>WeatherGPT | Farmer Assistant</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background:
+                radial-gradient(circle at 20% 20%, rgba(0, 180, 255, 0.12), transparent 30%),
+                radial-gradient(circle at 80% 80%, rgba(0, 255, 170, 0.10), transparent 30%),
+                #05070b;
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+
+        .cloud {
+            position: fixed;
+            width: 180px;
+            height: 55px;
+            background: rgba(255,255,255,0.025);
+            border-radius: 50px;
+            filter: blur(2px);
+            animation: moveCloud 25s linear infinite;
+            z-index: 0;
+        }
+
+        .cloud::before,
+        .cloud::after {
+            content: "";
+            position: absolute;
+            background: inherit;
+            border-radius: 50%;
+        }
+
+        .cloud::before {
+            width: 70px;
+            height: 70px;
+            left: 30px;
+            top: -30px;
+        }
+
+        .cloud::after {
+            width: 90px;
+            height: 90px;
+            right: 25px;
+            top: -45px;
+        }
+
+        .cloud.one {
+            top: 15%;
+            left: -200px;
+        }
+
+        .cloud.two {
+            top: 65%;
+            left: -250px;
+            animation-delay: 8s;
+        }
+
+        @keyframes moveCloud {
+            from {
+                transform: translateX(0);
+            }
+
+            to {
+                transform: translateX(130vw);
+            }
+        }
+
+        .layout {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* SIDEBAR */
+
+        .sidebar {
+            width: 250px;
+            min-height: 100vh;
+            background: rgba(8, 12, 18, 0.92);
+            border-right: 1px solid rgba(255,255,255,0.08);
+            padding: 25px 15px;
+            backdrop-filter: blur(20px);
+            position: fixed;
+            left: 0;
+            top: 0;
+        }
+
+        .logo {
+            font-size: 23px;
+            font-weight: 800;
+            margin-bottom: 35px;
+            padding-left: 10px;
+        }
+
+        .logo span {
+            color: #19d3ff;
+        }
+
+        .nav-title {
+            color: #6d7785;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            padding: 0 12px;
+            margin-bottom: 12px;
+        }
+
+        .nav a {
+            display: block;
+            text-decoration: none;
+            color: #9da7b4;
+            padding: 13px 14px;
+            margin: 5px 0;
+            border-radius: 12px;
+            transition: 0.3s;
+            font-size: 14px;
+        }
+
+        .nav a:hover,
+        .nav a.active {
+            color: white;
+            background: rgba(25,211,255,0.10);
+            transform: translateX(4px);
+        }
+
+        .nav a.active {
+            border: 1px solid rgba(25,211,255,0.18);
+        }
+
+        /* MAIN */
+
+        .main {
+            margin-left: 250px;
+            width: calc(100% - 250px);
+            padding: 35px;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 35px;
+        }
+
+        .topbar h1 {
+            font-size: 30px;
+        }
+
+        .topbar p {
+            color: #87919e;
+            margin-top: 7px;
+        }
+
+        .badge {
+            padding: 10px 15px;
+            border-radius: 30px;
+            background: rgba(25,211,255,0.08);
+            border: 1px solid rgba(25,211,255,0.18);
+            color: #19d3ff;
+            font-size: 13px;
+        }
+
+        /* HERO */
+
+        .hero {
+            background: linear-gradient(
+                135deg,
+                rgba(15, 35, 48, 0.85),
+                rgba(8, 16, 24, 0.92)
+            );
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 24px;
+            padding: 35px;
+            margin-bottom: 25px;
+            box-shadow: 0 25px 70px rgba(0,0,0,0.35);
+        }
+
+        .hero h2 {
+            font-size: 25px;
+            margin-bottom: 10px;
+        }
+
+        .hero p {
+            color: #9aa5b2;
+            line-height: 1.6;
+            max-width: 750px;
+        }
+
+        /* SEARCH */
+
+        .search-box {
+            margin-top: 25px;
+            display: flex;
+            gap: 12px;
+        }
+
+        .search-box input {
+            flex: 1;
+            background: rgba(0,0,0,0.35);
+            border: 1px solid rgba(255,255,255,0.10);
+            outline: none;
+            color: white;
+            padding: 16px 18px;
+            border-radius: 14px;
+            font-size: 14px;
+        }
+
+        .search-box input:focus {
+            border-color: rgba(25,211,255,0.6);
+        }
+
+        .ask-btn {
+            border: none;
+            padding: 0 25px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #19d3ff, #168cff);
+            color: white;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .ask-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(25,211,255,0.22);
+        }
+
+        /* QUICK QUESTIONS */
+
+        .section-title {
+            font-size: 18px;
+            margin: 28px 0 15px;
+        }
+
+        .quick-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        .quick-card {
+            padding: 20px;
+            border-radius: 17px;
+            background: rgba(255,255,255,0.035);
+            border: 1px solid rgba(255,255,255,0.07);
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .quick-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(25,211,255,0.35);
+            background: rgba(25,211,255,0.06);
+        }
+
+        .quick-card .icon {
+            font-size: 25px;
+            margin-bottom: 12px;
+        }
+
+        .quick-card h3 {
+            font-size: 14px;
+            margin-bottom: 6px;
+        }
+
+        .quick-card p {
+            font-size: 12px;
+            color: #7f8996;
+            line-height: 1.5;
+        }
+
+        /* RESPONSE */
+
+        .response {
+            margin-top: 25px;
+            padding: 25px;
+            border-radius: 20px;
+            background: rgba(255,255,255,0.035);
+            border: 1px solid rgba(255,255,255,0.07);
+            min-height: 130px;
+        }
+
+        .response-title {
+            color: #19d3ff;
+            font-size: 13px;
+            margin-bottom: 12px;
+            font-weight: 700;
+        }
+
+        #answer {
+            color: #c6ced8;
+            line-height: 1.7;
+            font-size: 14px;
+        }
+
+        /* INSIGHTS */
+
+        .insights {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+            margin-top: 25px;
+        }
+
+        .insight {
+            padding: 22px;
+            border-radius: 18px;
+            background: rgba(255,255,255,0.035);
+            border: 1px solid rgba(255,255,255,0.07);
+        }
+
+        .insight-icon {
+            font-size: 26px;
+            margin-bottom: 12px;
+        }
+
+        .insight h3 {
+            font-size: 15px;
+            margin-bottom: 8px;
+        }
+
+        .insight p {
+            color: #858f9c;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        /* MOBILE */
+
+        @media (max-width: 900px) {
+            .sidebar {
+                width: 210px;
+            }
+
+            .main {
+                margin-left: 210px;
+                width: calc(100% - 210px);
+                padding: 25px;
+            }
+
+            .quick-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .insights {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 650px) {
+            .sidebar {
+                position: relative;
+                width: 100%;
+                min-height: auto;
+            }
+
+            .layout {
+                display: block;
+            }
+
+            .main {
+                margin-left: 0;
+                width: 100%;
+                padding: 20px;
+            }
+
+            .topbar {
+                display: block;
+            }
+
+            .badge {
+                display: inline-block;
+                margin-top: 15px;
+            }
+
+            .search-box {
+                flex-direction: column;
+            }
+
+            .ask-btn {
+                height: 50px;
+            }
+
+            .quick-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="cloud one"></div>
+<div class="cloud two"></div>
+
+<div class="layout">
+
+    <aside class="sidebar">
+
+        <div class="logo">
+            Weather<span>GPT</span> 🌦️
+        </div>
+
+        <div class="nav-title">Navigation</div>
+
+        <div class="nav">
+
+            <a href="/home/">🏠 Home</a>
+
+            <a href="/weather/">🌤️ Weather</a>
+
+            <a href="/forecast/">📅 Forecast</a>
+
+            <a href="/farmer-assistant/" class="active">
+                🌾 Farmer Assistant
+            </a>
+
+            <a href="/alerts/">⚠️ Alerts</a>
+
+            <a href="/climate/">🌍 Climate</a>
+
+            <a href="/chatbot/">🤖 AI Chatbot</a>
+
+            <a href="/profile/">👤 Profile</a>
+
+            <a href="/logout/">🚪 Logout</a>
+
+        </div>
+
+    </aside>
+
+    <main class="main">
+
+        <div class="topbar">
+
+            <div>
+                <h1>Farmer Assistant 🌾</h1>
+                <p>Weather-based agricultural assistance powered by WeatherGPT</p>
+            </div>
+
+            <div class="badge">
+                ● Weather Intelligence
+            </div>
+
+        </div>
+
+        <section class="hero">
+
+            <h2>Ask WeatherGPT for Farming Guidance</h2>
+
+            <p>
+                Ask natural-language questions about weather conditions,
+                rainfall, forecasts and weather-related farming risks.
+                WeatherGPT analyzes weather information and provides
+                conversational assistance.
+            </p>
+
+            <div class="search-box">
+
+                <input
+                    type="text"
+                    id="farmerQuestion"
+                    placeholder="Example: Will it rain tomorrow?"
+                >
+
+                <button class="ask-btn" onclick="askFarmerAssistant()">
+                    Ask Assistant
+                </button>
+
+            </div>
+
+        </section>
+
+        <h2 class="section-title">Quick Questions</h2>
+
+        <div class="quick-grid">
+
+            <div class="quick-card"
+                 onclick="setQuestion('Will it rain tomorrow?')">
+
+                <div class="icon">🌧️</div>
+
+                <h3>Rain Forecast</h3>
+
+                <p>
+                    Check upcoming rainfall conditions.
+                </p>
+
+            </div>
+
+            <div class="quick-card"
+                 onclick="setQuestion('What are the weather conditions for farming?')">
+
+                <div class="icon">🌱</div>
+
+                <h3>Farming Conditions</h3>
+
+                <p>
+                    Understand current weather conditions.
+                </p>
+
+            </div>
+
+            <div class="quick-card"
+                 onclick="setQuestion('Are there any weather risks today?')">
+
+                <div class="icon">⚠️</div>
+
+                <h3>Weather Risks</h3>
+
+                <p>
+                    Ask about potentially risky weather.
+                </p>
+
+            </div>
+
+            <div class="quick-card"
+                 onclick="setQuestion('What is the best weather window?')">
+
+                <div class="icon">☀️</div>
+
+                <h3>Weather Window</h3>
+
+                <p>
+                    Find suitable weather periods.
+                </p>
+
+            </div>
+
+        </div>
+
+        <div class="response">
+
+            <div class="response-title">
+                WEATHERGPT ASSISTANT
+            </div>
+
+            <div id="answer">
+                Ask a question above to receive weather-based assistance.
+            </div>
+
+        </div>
+
+        <h2 class="section-title">
+            Weather Intelligence
+        </h2>
+
+        <div class="insights">
+
+            <div class="insight">
+
+                <div class="insight-icon">🌦️</div>
+
+                <h3>Weather Conditions</h3>
+
+                <p>
+                    Get weather information relevant to farming
+                    activities and outdoor conditions.
+                </p>
+
+            </div>
+
+            <div class="insight">
+
+                <div class="insight-icon">📊</div>
+
+                <h3>Forecast Insights</h3>
+
+                <p>
+                    Use forecast information to understand
+                    upcoming weather patterns.
+                </p>
+
+            </div>
+
+            <div class="insight">
+
+                <div class="insight-icon">🚨</div>
+
+                <h3>Weather Awareness</h3>
+
+                <p>
+                    Stay informed about weather conditions
+                    that may affect agricultural activities.
+                </p>
+
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
+<script>
+
+    const questionInput =
+        document.getElementById("farmerQuestion");
+
+    const answerBox =
+        document.getElementById("answer");
+
+
+    function setQuestion(question) {
+
+        questionInput.value = question;
+        questionInput.focus();
+
+    }
+
+
+    async function askFarmerAssistant() {
+
+        const question =
+            questionInput.value.trim();
+
+
+        if (!question) {
+
+            answerBox.innerHTML =
+                "⚠️ Please enter your weather-related question.";
+
+            return;
+        }
+
+
+        answerBox.innerHTML =
+            "🤖 WeatherGPT is analyzing weather data...";
+
+
+        /*
+         * Try to detect a location from the question.
+         * If no location is mentioned, ask the user to provide one.
+         */
+
+        const locationMatch =
+            question.match(
+                /(?:in|at|near|for)\s+([a-zA-Z\s]+)$/i
+            );
+
+
+        let location = "";
+
+
+        if (locationMatch) {
+
+            location =
+                locationMatch[1].trim();
+
+        }
+
+
+        /*
+         * Default location can be entered manually
+         * through the prompt if not detected.
+         */
+
+        if (!location) {
+
+            location =
+                prompt(
+                    "Enter your city/location for weather information:"
+                );
+
+        }
+
+
+        if (!location) {
+
+            answerBox.innerHTML =
+                "📍 Please provide a location so WeatherGPT can analyze the weather.";
+
+            return;
+        }
+
+
+        try {
+
+            const response =
+                await fetch(
+                    `/farmer-assistant/api/?location=${encodeURIComponent(location)}`
+                );
+
+
+            const data =
+                await response.json();
+
+
+            if (!response.ok || !data.success) {
+
+                throw new Error(
+                    data.message ||
+                    "Unable to fetch weather data."
+                );
+
+            }
+
+
+            const current =
+                data.current;
+
+
+            const forecast =
+                data.forecast;
+
+
+            const rainProbability =
+                forecast.rain_probability?.[0] ?? 0;
+
+
+            const rainfall =
+                forecast.rainfall?.[0] ?? 0;
+
+
+            const temperature =
+                current.temperature;
+
+
+            const humidity =
+                current.humidity;
+
+
+            const wind =
+                current.wind;
+
+
+            let farmingAdvice = "";
+
+
+            /*
+             * Weather-based farming assistance.
+             */
+
+            if (rainProbability >= 70) {
+
+                farmingAdvice =
+                    "🌧️ High rainfall probability detected. " +
+                    "Consider weather conditions before planning outdoor agricultural activities.";
+
+            }
+
+            else if (rainProbability >= 40) {
+
+                farmingAdvice =
+                    "🌦️ Moderate rainfall probability detected. " +
+                    "Keep upcoming farming activities flexible according to the forecast.";
+
+            }
+
+            else {
+
+                farmingAdvice =
+                    "☀️ Low rainfall probability detected. " +
+                    "Current conditions show relatively lower chances of rain.";
+
+            }
+
+
+            if (temperature >= 35) {
+
+                farmingAdvice +=
+                    "<br><br>🌡️ High temperature is currently observed. " +
+                    "Monitor weather conditions carefully during outdoor activities.";
+
+            }
+
+
+            if (wind >= 30) {
+
+                farmingAdvice +=
+                    "<br><br>💨 Strong winds are indicated. " +
+                    "Take wind conditions into account when planning outdoor activities.";
+
+            }
+
+
+            answerBox.innerHTML = `
+
+                <div style="
+                    margin-bottom:15px;
+                    font-size:17px;
+                    color:#ffffff;
+                    font-weight:700;
+                ">
+                    📍 ${escapeHtml(data.location.city)},
+                    ${escapeHtml(data.location.country)}
+                </div>
+
+
+                <div style="
+                    display:grid;
+                    grid-template-columns:
+                    repeat(auto-fit,minmax(130px,1fr));
+                    gap:12px;
+                    margin-bottom:20px;
+                ">
+
+                    <div style="
+                        padding:14px;
+                        border-radius:12px;
+                        background:rgba(255,255,255,0.05);
+                    ">
+                        🌡️ Temperature
+                        <br>
+                        <strong>
+                            ${temperature ?? "--"} °C
+                        </strong>
+                    </div>
+
+
+                    <div style="
+                        padding:14px;
+                        border-radius:12px;
+                        background:rgba(255,255,255,0.05);
+                    ">
+                        💧 Humidity
+                        <br>
+                        <strong>
+                            ${humidity ?? "--"} %
+                        </strong>
+                    </div>
+
+
+                    <div style="
+                        padding:14px;
+                        border-radius:12px;
+                        background:rgba(255,255,255,0.05);
+                    ">
+                        🌧️ Rain Chance
+                        <br>
+                        <strong>
+                            ${rainProbability} %
+                        </strong>
+                    </div>
+
+
+                    <div style="
+                        padding:14px;
+                        border-radius:12px;
+                        background:rgba(255,255,255,0.05);
+                    ">
+                        💨 Wind
+                        <br>
+                        <strong>
+                            ${wind ?? "--"} km/h
+                        </strong>
+                    </div>
+
+                </div>
+
+
+                <div style="
+                    padding:16px;
+                    border-radius:14px;
+                    background:rgba(25,211,255,0.06);
+                    border:1px solid rgba(25,211,255,0.15);
+                ">
+
+                    <strong>
+                        🌾 Weather-Based Farming Insight
+                    </strong>
+
+                    <br><br>
+
+                    ${farmingAdvice}
+
+                </div>
+
+            `;
+
+
+        } catch (error) {
+
+            answerBox.innerHTML =
+                "❌ " +
+                escapeHtml(
+                    error.message ||
+                    "Unable to fetch weather information."
+                );
+
+        }
+
+    }
+
+
+    function escapeHtml(value) {
+
+        return String(value ?? "")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+
+    }
+
+
+    questionInput.addEventListener(
+        "keypress",
+        function(event) {
+
+            if (event.key === "Enter") {
+
+                askFarmerAssistant();
+
+            }
+
+        }
+    );
+
+</script>
+</body>
+</html>

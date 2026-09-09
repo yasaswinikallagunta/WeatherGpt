@@ -1,0 +1,2873 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>WeatherGPT AI Assistant</title>
+
+
+    <style>
+
+        /* =====================================================
+           RESET
+        ===================================================== */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+        }
+
+
+        body {
+
+            font-family:
+                Inter,
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                sans-serif;
+
+            background: #05080d;
+
+            color: #f5f7fa;
+
+            overflow: hidden;
+
+        }
+
+
+        button,
+        textarea {
+            font-family: inherit;
+        }
+
+
+        /* =====================================================
+           MAIN APP
+        ===================================================== */
+
+        .app {
+
+            width: 100%;
+            height: 100vh;
+
+            display: flex;
+
+            position: relative;
+
+            overflow: hidden;
+
+            background:
+
+                radial-gradient(
+                    circle at 75% 10%,
+                    rgba(0, 183, 255, 0.08),
+                    transparent 28%
+                ),
+
+                radial-gradient(
+                    circle at 20% 90%,
+                    rgba(65, 105, 225, 0.06),
+                    transparent 30%
+                ),
+
+                #05080d;
+
+        }
+
+
+        /* =====================================================
+           SIDEBAR
+        ===================================================== */
+
+        .sidebar {
+
+            width: 250px;
+            height: 100vh;
+
+            flex-shrink: 0;
+
+            display: flex;
+            flex-direction: column;
+
+            padding: 20px 15px;
+
+            background:
+
+                linear-gradient(
+                    180deg,
+                    #0b1017 0%,
+                    #080c12 100%
+                );
+
+            border-right:
+                1px solid rgba(255, 255, 255, 0.07);
+
+            position: relative;
+
+            z-index: 10;
+
+        }
+
+
+        /* =====================================================
+           BRAND
+        ===================================================== */
+
+        .brand {
+
+            display: flex;
+            align-items: center;
+
+            gap: 12px;
+
+            padding: 7px 8px 24px;
+
+        }
+
+
+        .brand-icon {
+
+            width: 46px;
+            height: 46px;
+
+            flex-shrink: 0;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 14px;
+
+            font-size: 24px;
+
+            background:
+
+                linear-gradient(
+                    135deg,
+                    #102b3b,
+                    #08739a
+                );
+
+            border:
+                1px solid rgba(58, 202, 255, 0.35);
+
+            box-shadow:
+
+                0 8px 25px
+                rgba(0, 183, 255, 0.15);
+
+        }
+
+
+        .brand-text h1 {
+
+            font-size: 18px;
+
+            font-weight: 750;
+
+            letter-spacing: -0.4px;
+
+            color: #ffffff;
+
+        }
+
+
+        .brand-text p {
+
+            margin-top: 3px;
+
+            font-size: 10px;
+
+            color: #718093;
+
+            letter-spacing: 0.2px;
+
+        }
+
+
+        /* =====================================================
+           NEW CHAT BUTTON
+        ===================================================== */
+
+        .new-chat-btn {
+
+            width: 100%;
+
+            border: 1px solid
+                rgba(55, 198, 255, 0.28);
+
+            border-radius: 12px;
+
+            padding: 12px 14px;
+
+            display: flex;
+            align-items: center;
+
+            gap: 10px;
+
+            background:
+
+                linear-gradient(
+                    135deg,
+                    rgba(0, 180, 255, 0.15),
+                    rgba(0, 120, 180, 0.07)
+                );
+
+            color: #eefaff;
+
+            font-size: 13px;
+
+            font-weight: 650;
+
+            cursor: pointer;
+
+            transition:
+                0.2s ease;
+
+        }
+
+
+        .new-chat-btn:hover {
+
+            border-color:
+                rgba(55, 198, 255, 0.5);
+
+            background:
+
+                linear-gradient(
+                    135deg,
+                    rgba(0, 180, 255, 0.23),
+                    rgba(0, 120, 180, 0.12)
+                );
+
+            transform: translateY(-1px);
+
+        }
+
+
+        .new-chat-icon {
+
+            font-size: 18px;
+
+            line-height: 1;
+
+        }
+
+
+        /* =====================================================
+           SIDEBAR SECTION
+        ===================================================== */
+
+        .sidebar-section {
+
+            margin-top: 27px;
+
+        }
+
+
+        .sidebar-label {
+
+            padding:
+                0 9px 9px;
+
+            font-size: 10px;
+
+            font-weight: 700;
+
+            letter-spacing: 1.5px;
+
+            text-transform: uppercase;
+
+            color: #566273;
+
+        }
+
+
+        /* =====================================================
+           MENU
+        ===================================================== */
+
+        .menu-item {
+
+            width: 100%;
+
+            display: flex;
+            align-items: center;
+
+            gap: 12px;
+
+            padding: 11px 12px;
+
+            margin-bottom: 4px;
+
+            border-radius: 10px;
+
+            text-decoration: none;
+
+            color: #929eae;
+
+            font-size: 13px;
+
+            font-weight: 550;
+
+            transition:
+                background 0.2s ease,
+                color 0.2s ease,
+                transform 0.2s ease;
+
+        }
+
+
+        .menu-item:hover {
+
+            background:
+                rgba(255, 255, 255, 0.045);
+
+            color: #ffffff;
+
+            transform: translateX(2px);
+
+        }
+
+
+        .menu-item.active {
+
+            color: #ffffff;
+
+            background:
+
+                linear-gradient(
+                    90deg,
+                    rgba(0, 188, 255, 0.17),
+                    rgba(0, 188, 255, 0.045)
+                );
+
+            border-left:
+                2px solid #35c8ff;
+
+        }
+
+
+        .menu-icon {
+
+            width: 24px;
+
+            flex-shrink: 0;
+
+            text-align: center;
+
+            font-size: 17px;
+
+        }
+
+
+        .menu-text {
+
+            white-space: nowrap;
+
+        }
+
+
+        /* =====================================================
+           SIDEBAR BOTTOM
+        ===================================================== */
+
+        .sidebar-bottom {
+
+            margin-top: auto;
+
+            padding-top: 14px;
+
+            border-top:
+                1px solid rgba(255, 255, 255, 0.06);
+
+        }
+
+
+        .clear-btn {
+
+            width: 100%;
+
+            border: none;
+
+            border-radius: 9px;
+
+            padding: 10px 12px;
+
+            background: transparent;
+
+            color: #717d8d;
+
+            text-align: left;
+
+            font-size: 12px;
+
+            cursor: pointer;
+
+            transition:
+                0.2s ease;
+
+        }
+
+
+        .clear-btn:hover {
+
+            background:
+                rgba(255, 80, 80, 0.08);
+
+            color: #ff9292;
+
+        }
+
+
+        /* =====================================================
+           MAIN CONTENT AREA
+        ===================================================== */
+
+        .main {
+
+            flex: 1;
+
+            min-width: 0;
+            min-height: 0;
+
+            height: 100vh;
+
+            display: flex;
+            flex-direction: column;
+
+            position: relative;
+
+            overflow: hidden;
+
+            background:
+
+                radial-gradient(
+                    circle at 50% 0%,
+                    rgba(0, 174, 255, 0.055),
+                    transparent 38%
+                );
+
+        }
+
+
+        /* =====================================================
+           BACKGROUND EFFECTS
+        ===================================================== */
+
+        .main::before {
+
+            content: "";
+
+            position: absolute;
+
+            width: 520px;
+            height: 520px;
+
+            border-radius: 50%;
+
+            background:
+
+                radial-gradient(
+                    circle,
+                    rgba(0, 183, 255, 0.045),
+                    transparent 68%
+                );
+
+            top: -230px;
+            right: -120px;
+
+            pointer-events: none;
+
+        }
+
+
+        .main::after {
+
+            content: "";
+
+            position: absolute;
+
+            width: 400px;
+            height: 400px;
+
+            border-radius: 50%;
+
+            background:
+
+                radial-gradient(
+                    circle,
+                    rgba(75, 105, 255, 0.035),
+                    transparent 70%
+                );
+
+            bottom: -230px;
+            left: 10%;
+
+            pointer-events: none;
+
+        }
+
+
+        /* =====================================================
+           MOBILE SIDEBAR
+        ===================================================== */
+
+        @media (max-width: 700px) {
+
+            .sidebar {
+
+                width: 70px;
+
+                padding:
+                    18px 9px;
+
+            }
+
+
+            .brand {
+
+                justify-content: center;
+
+                padding:
+                    5px 0 22px;
+
+            }
+
+
+            .brand-text {
+
+                display: none;
+
+            }
+
+
+            .new-chat-btn {
+
+                justify-content: center;
+
+                padding:
+                    12px 0;
+
+            }
+
+
+            .new-chat-btn span:last-child {
+
+                display: none;
+
+            }
+
+
+            .sidebar-label {
+
+                display: none;
+
+            }
+
+
+            .menu-item {
+
+                justify-content: center;
+
+                padding:
+                    12px 0;
+
+            }
+
+
+            .menu-text {
+
+                display: none;
+
+            }
+
+
+            .clear-btn {
+
+                text-align: center;
+
+                font-size: 0;
+
+            }
+
+
+            .clear-btn:first-letter {
+
+                font-size: 16px;
+
+            }
+
+        }
+        .recent-btn {
+
+    width: 100%;
+
+    border: none;
+
+    border-radius: 9px;
+
+    padding: 10px 12px;
+
+    margin-bottom: 4px;
+
+    background: transparent;
+
+    color: #788596;
+
+    text-align: left;
+
+    font-size: 12px;
+
+    cursor: pointer;
+
+    transition: 0.2s ease;
+
+}
+
+
+.recent-btn:hover {
+
+    background:
+        rgba(0, 183, 255, 0.08);
+
+    color: #53ceff;
+
+}
+
+    </style>
+
+</head>
+
+
+<body>
+
+<div class="app">
+
+
+    <aside class="sidebar">
+
+
+        <div class="brand">
+
+            <div class="brand-icon">
+                🌦️
+            </div>
+
+            <div class="brand-text">
+
+                <h1>
+                    WeatherGPT
+                </h1>
+
+                <p>
+                    AI Weather Intelligence
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <button
+            type="button"
+            class="new-chat-btn"
+            onclick="newChat()"
+        >
+
+            <span class="new-chat-icon">
+                ＋
+            </span>
+
+            <span>
+                New Chat
+            </span>
+
+        </button>
+
+
+        <div class="sidebar-section">
+
+            <div class="sidebar-label">
+                Workspace
+            </div>
+
+
+            <a
+                href="{% url 'home' %}"
+                class="menu-item"
+            >
+
+                <span class="menu-icon">
+                    ⌂
+                </span>
+
+                <span class="menu-text">
+                    Dashboard
+                </span>
+
+            </a>
+
+
+            <a
+                href="{% url 'weather' %}"
+                class="menu-item"
+            >
+
+                <span class="menu-icon">
+                    🌤️
+                </span>
+
+                <span class="menu-text">
+                    Weather
+                </span>
+
+            </a>
+
+
+            <a
+                href="{% url 'forecast' %}"
+                class="menu-item"
+            >
+
+                <span class="menu-icon">
+                    📅
+                </span>
+
+                <span class="menu-text">
+                    Forecast
+                </span>
+
+            </a>
+
+
+            <a
+                href="{% url 'alerts' %}"
+                class="menu-item"
+            >
+
+                <span class="menu-icon">
+                    ⚠️
+                </span>
+
+                <span class="menu-text">
+                    Alerts
+                </span>
+
+            </a>
+
+
+            <a
+                href="{% url 'climate' %}"
+                class="menu-item"
+            >
+
+                <span class="menu-icon">
+                    🌍
+                </span>
+
+                <span class="menu-text">
+                    Climate
+                </span>
+
+            </a>
+
+
+            <a
+                href="{% url 'chatbot' %}"
+                class="menu-item active"
+            >
+
+                <span class="menu-icon">
+                    🤖
+                </span>
+
+                <span class="menu-text">
+                    AI Chatbot
+                </span>
+
+            </a>
+
+        </div>
+        <div class="sidebar-bottom">
+
+    <button
+        type="button"
+        class="recent-btn"
+        onclick="openRecent()"
+    >
+        🕘 &nbsp; Recent Searches
+    </button>
+
+
+    <button
+        type="button"
+        class="clear-btn"
+        onclick="clearChats()"
+    >
+        🗑️ &nbsp; Clear Chat History
+    </button>
+
+</div>
+
+
+    </aside>
+
+
+    <main class="main">
+        <!-- =====================================================
+             AI HEADER
+        ===================================================== -->
+
+        <header class="chat-header">
+
+            <div class="chat-header-left">
+
+                <div class="ai-avatar">
+                    🤖
+                </div>
+
+                <div class="ai-title">
+
+                    <h2>
+                        WeatherGPT AI Assistant
+                    </h2>
+
+                    <p>
+                        Conversational weather intelligence
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="ai-status">
+
+                <span class="status-dot"></span>
+
+                <span>
+                    AI Online
+                </span>
+
+            </div>
+
+        </header>
+
+
+        <!-- =====================================================
+             CHAT AREA
+        ===================================================== -->
+
+        <section
+            class="chat-area"
+            id="chatArea"
+        >
+
+            <div class="welcome-screen">
+
+                <div class="welcome-icon">
+                    🌦️
+                </div>
+
+                <h1>
+                    How can I help with the weather?
+                </h1>
+
+                <p>
+                    Ask me naturally about weather,
+                    temperature, rain, wind, forecasts,
+                    alerts or climate.
+                </p>
+
+            </div>
+
+        </section>
+        <style>
+
+            /* =================================================
+               CHAT AREA
+            ================================================= */
+
+            .chat-area {
+
+                flex: 1;
+
+                min-height: 0;
+
+                width: 100%;
+
+                overflow-y: auto;
+                overflow-x: hidden;
+
+                padding:
+                    35px 7% 145px;
+
+                display: flex;
+                flex-direction: column;
+
+                gap: 22px;
+
+                position: relative;
+
+                z-index: 2;
+
+                scroll-behavior: smooth;
+
+                scrollbar-width: thin;
+
+                scrollbar-color:
+                    rgba(255,255,255,0.20)
+                    transparent;
+
+            }
+
+
+            .chat-area::-webkit-scrollbar {
+                width: 7px;
+            }
+
+
+            .chat-area::-webkit-scrollbar-track {
+                background: transparent;
+            }
+
+
+            .chat-area::-webkit-scrollbar-thumb {
+
+                background:
+                    rgba(255,255,255,0.18);
+
+                border-radius: 20px;
+
+            }
+
+
+            .chat-area::-webkit-scrollbar-thumb:hover {
+
+                background:
+                    rgba(255,255,255,0.30);
+
+            }
+
+
+            /* =================================================
+               WELCOME
+            ================================================= */
+
+            .welcome-screen {
+
+                margin: auto;
+
+                width: min(680px, 90%);
+
+                text-align: center;
+
+                padding: 45px 25px;
+
+                animation:
+                    welcomeIn 0.6s ease;
+
+            }
+
+
+            .welcome-icon {
+
+                width: 72px;
+                height: 72px;
+
+                margin: 0 auto 22px;
+
+                display: flex;
+                align-items: center;
+                justify-content: center;
+
+                border-radius: 22px;
+
+                font-size: 38px;
+
+                background:
+                    linear-gradient(
+                        135deg,
+                        rgba(0,180,255,0.16),
+                        rgba(55,80,150,0.12)
+                    );
+
+                border:
+                    1px solid
+                    rgba(75,200,255,0.22);
+
+                box-shadow:
+                    0 15px 45px
+                    rgba(0,160,255,0.10);
+
+            }
+
+
+            .welcome-screen h1 {
+
+                font-size:
+                    clamp(25px, 3vw, 38px);
+
+                line-height: 1.2;
+
+                font-weight: 750;
+
+                letter-spacing: -1px;
+
+                color: #ffffff;
+
+            }
+
+
+            .welcome-screen p {
+
+                max-width: 570px;
+
+                margin: 15px auto 0;
+
+                color: #7f8b9c;
+
+                font-size: 14px;
+
+                line-height: 1.7;
+
+            }
+
+
+            @keyframes welcomeIn {
+
+                from {
+                    opacity: 0;
+                    transform: translateY(12px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+
+            }
+
+
+            /* =================================================
+               MESSAGE
+            ================================================= */
+
+            .message {
+
+                width: 100%;
+
+                display: flex;
+
+                align-items: flex-start;
+
+                gap: 12px;
+
+                flex-shrink: 0;
+
+                animation:
+                    messageIn 0.25s ease;
+
+            }
+
+
+            @keyframes messageIn {
+
+                from {
+                    opacity: 0;
+                    transform: translateY(7px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+
+            }
+
+
+            .message.user {
+
+                justify-content: flex-end;
+
+            }
+
+
+            .message-content {
+
+                max-width: min(760px, 78%);
+
+            }
+
+
+            .sender {
+
+                margin-bottom: 6px;
+
+                font-size: 11px;
+
+                font-weight: 650;
+
+                color: #718093;
+
+            }
+
+
+            .message.user .sender {
+
+                text-align: right;
+
+            }
+
+
+            .bubble {
+
+                padding: 13px 16px;
+
+                border-radius: 15px;
+
+                font-size: 14px;
+
+                line-height: 1.65;
+
+                word-wrap: break-word;
+
+            }
+
+
+            .message.bot .bubble {
+
+                background:
+                    rgba(18,24,33,0.92);
+
+                border:
+                    1px solid
+                    rgba(255,255,255,0.075);
+
+                color: #dfe6ee;
+
+                border-top-left-radius: 5px;
+
+                box-shadow:
+                    0 8px 25px
+                    rgba(0,0,0,0.16);
+
+            }
+
+
+            .message.user .bubble {
+
+                background:
+                    linear-gradient(
+                        135deg,
+                        #087da8,
+                        #075c80
+                    );
+
+                color: #ffffff;
+
+                border:
+                    1px solid
+                    rgba(70,210,255,0.20);
+
+                border-top-right-radius: 5px;
+
+                box-shadow:
+                    0 8px 25px
+                    rgba(0,130,180,0.14);
+
+            }
+
+
+            .message.bot .bubble b {
+
+                color: #ffffff;
+
+            }
+
+
+            /* =================================================
+               AVATARS
+            ================================================= */
+
+            .avatar {
+
+                width: 36px;
+                height: 36px;
+
+                flex-shrink: 0;
+
+                display: flex;
+                align-items: center;
+                justify-content: center;
+
+                border-radius: 11px;
+
+                font-size: 17px;
+
+            }
+
+
+            .bot-avatar {
+
+                background:
+                    linear-gradient(
+                        135deg,
+                        #102b3b,
+                        #08739a
+                    );
+
+                border:
+                    1px solid
+                    rgba(65,200,255,0.25);
+
+            }
+
+
+            .user-avatar {
+
+                background:
+                    linear-gradient(
+                        135deg,
+                        #27303c,
+                        #151b24
+                    );
+
+                border:
+                    1px solid
+                    rgba(255,255,255,0.10);
+
+            }
+
+
+            /* =================================================
+               TYPING INDICATOR
+            ================================================= */
+
+            .typing-bubble {
+
+                min-width: 70px;
+
+                display: flex;
+
+                align-items: center;
+
+                gap: 5px;
+
+            }
+
+
+            .typing-bubble span {
+
+                width: 6px;
+                height: 6px;
+
+                border-radius: 50%;
+
+                background: #7c8998;
+
+                animation:
+                    typing 1.2s infinite ease-in-out;
+
+            }
+
+
+            .typing-bubble span:nth-child(2) {
+                animation-delay: 0.15s;
+            }
+
+
+            .typing-bubble span:nth-child(3) {
+                animation-delay: 0.30s;
+            }
+
+
+            @keyframes typing {
+
+                0%,
+                60%,
+                100% {
+                    transform: translateY(0);
+                    opacity: 0.45;
+                }
+
+                30% {
+                    transform: translateY(-4px);
+                    opacity: 1;
+                }
+
+            }
+
+
+            /* =================================================
+               MOBILE CHAT
+            ================================================= */
+
+            @media (max-width: 700px) {
+
+                .chat-area {
+
+                    padding:
+                        25px 14px 135px;
+
+                }
+
+
+                .message-content {
+
+                    max-width: 84%;
+
+                }
+
+
+                .bubble {
+
+                    font-size: 13px;
+
+                    padding:
+                        11px 13px;
+
+                }
+
+
+                .avatar {
+
+                    width: 33px;
+                    height: 33px;
+
+                    border-radius: 10px;
+
+                    font-size: 15px;
+
+                }
+
+
+                .welcome-screen {
+
+                    padding:
+                        25px 10px;
+
+                }
+
+            }
+
+        </style>
+        <!-- =====================================================
+             MESSAGE INPUT
+        ===================================================== -->
+
+        <div class="input-area">
+
+            <div class="input-wrapper">
+
+                <div class="input-box">
+
+                    <textarea
+                        id="messageInput"
+                        rows="1"
+                        placeholder="Message WeatherGPT..."
+                        autocomplete="off"
+                    ></textarea>
+
+
+                    <button
+                        type="button"
+                        id="sendButton"
+                        onclick="sendMessage()"
+                        title="Send message"
+                    >
+                        ➤
+                    </button>
+
+                </div>
+
+
+                <div class="input-footer">
+
+                    <span>
+                        WeatherGPT can understand natural-language
+                        weather questions.
+                    </span>
+
+                    <span>
+                        Enter ↵
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================================
+             RECENT SEARCH OVERLAY
+        ===================================================== -->
+
+        <div
+            class="recent-overlay"
+            id="recentOverlay"
+            onclick="closeRecent()"
+        ></div>
+
+
+        <!-- =====================================================
+             RECENT SEARCH PANEL
+        ===================================================== -->
+
+        <aside
+            class="recent-panel"
+            id="recentPanel"
+        >
+
+            <div class="recent-header">
+
+                <div>
+
+                    <h2>
+                        🕘 Recent Searches
+                    </h2>
+
+                    <p>
+                        Your latest weather questions
+                    </p>
+
+                </div>
+
+
+                <button
+                    type="button"
+                    class="recent-close"
+                    onclick="closeRecent()"
+                >
+                    ✕
+                </button>
+
+            </div>
+
+
+            <div
+                class="recent-list"
+                id="recentList"
+            >
+
+                {% for search in searches %}
+
+                    <div
+                        class="recent-item"
+                        id="recent-{{ search.id }}"
+                    >
+
+                        <div class="recent-item-content">
+
+                            <div class="recent-query">
+                                {{ search.query|escape }}
+                            </div>
+
+
+                            {% if search.location %}
+
+                                <div class="recent-location">
+                                    📍 {{ search.location|escape }}
+                                </div>
+
+                            {% endif %}
+
+                        </div>
+
+
+                        <button
+                            type="button"
+                            class="recent-delete"
+                            data-search-id="{{ search.id }}"
+                            title="Delete search"
+                        >
+                            🗑️
+                        </button>
+
+                    </div>
+
+                {% empty %}
+
+                    <div class="recent-empty">
+
+                        <div class="recent-empty-icon">
+                            🕘
+                        </div>
+
+                        <p>
+                            No recent searches yet.
+                        </p>
+
+                        <span>
+                            Your weather questions will appear here.
+                        </span>
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        </aside>
+
+
+        <style>
+
+            /* =================================================
+               INPUT AREA
+            ================================================= */
+
+            .input-area {
+
+                position: absolute;
+
+                left: 0;
+                right: 0;
+                bottom: 0;
+
+                z-index: 8;
+
+                padding:
+                    18px 7% 22px;
+
+                background:
+
+                    linear-gradient(
+                        to top,
+                        #05080d 58%,
+                        rgba(5,8,13,0.96) 78%,
+                        rgba(5,8,13,0)
+                    );
+
+            }
+
+
+            .input-wrapper {
+
+                width: 100%;
+
+                max-width: 900px;
+
+                margin: 0 auto;
+
+            }
+
+
+            .input-box {
+
+                display: flex;
+
+                align-items: flex-end;
+
+                gap: 10px;
+
+                padding: 8px 8px 8px 16px;
+
+                background:
+                    rgba(15,21,29,0.96);
+
+                border:
+                    1px solid
+                    rgba(255,255,255,0.10);
+
+                border-radius: 17px;
+
+                box-shadow:
+                    0 15px 45px
+                    rgba(0,0,0,0.35);
+
+                transition:
+                    border-color 0.2s ease,
+                    box-shadow 0.2s ease;
+
+            }
+
+
+            .input-box:focus-within {
+
+                border-color:
+                    rgba(48,198,255,0.42);
+
+                box-shadow:
+                    0 15px 50px
+                    rgba(0,0,0,0.4),
+                    0 0 0 3px
+                    rgba(0,180,255,0.055);
+
+            }
+
+
+            #messageInput {
+
+                flex: 1;
+
+                min-width: 0;
+
+                max-height: 130px;
+
+                resize: none;
+
+                overflow-y: auto;
+
+                border: none;
+
+                outline: none;
+
+                background: transparent;
+
+                color: #f2f6fa;
+
+                font-size: 14px;
+
+                line-height: 1.55;
+
+                padding:
+                    8px 0;
+
+            }
+
+
+            #messageInput::placeholder {
+
+                color: #657283;
+
+            }
+
+
+            #messageInput::-webkit-scrollbar {
+                width: 5px;
+            }
+
+
+            #messageInput::-webkit-scrollbar-thumb {
+
+                background:
+                    rgba(255,255,255,0.18);
+
+                border-radius: 10px;
+
+            }
+
+
+            #sendButton {
+
+                width: 42px;
+                height: 42px;
+
+                flex-shrink: 0;
+
+                border: none;
+
+                border-radius: 13px;
+
+                display: flex;
+                align-items: center;
+                justify-content: center;
+
+                background:
+                    linear-gradient(
+                        135deg,
+                        #0aa8dc,
+                        #08729c
+                    );
+
+                color: white;
+
+                font-size: 20px;
+
+                cursor: pointer;
+
+                transition:
+                    transform 0.2s ease,
+                    opacity 0.2s ease,
+                    filter 0.2s ease;
+
+            }
+
+
+            #sendButton:hover {
+
+                transform:
+                    translateY(-2px);
+
+                filter:
+                    brightness(1.12);
+
+            }
+
+
+            #sendButton:active {
+
+                transform:
+                    translateY(0);
+
+            }
+
+
+            #sendButton:disabled {
+
+                opacity: 0.45;
+
+                cursor: not-allowed;
+
+                transform: none;
+
+            }
+
+
+            .input-footer {
+
+                display: flex;
+
+                align-items: center;
+                justify-content: space-between;
+
+                gap: 15px;
+
+                padding:
+                    8px 5px 0;
+
+                color: #566273;
+
+                font-size: 10px;
+
+            }
+
+
+            /* =================================================
+               RECENT OVERLAY
+            ================================================= */
+
+            .recent-overlay {
+
+                position: fixed;
+
+                inset: 0;
+
+                background:
+                    rgba(0,0,0,0.55);
+
+                backdrop-filter:
+                    blur(3px);
+
+                opacity: 0;
+
+                visibility: hidden;
+
+                transition:
+                    0.25s ease;
+
+                z-index: 40;
+
+            }
+
+
+            .recent-overlay.show {
+
+                opacity: 1;
+
+                visibility: visible;
+
+            }
+
+
+            /* =================================================
+               RECENT PANEL
+            ================================================= */
+
+            .recent-panel {
+
+                position: fixed;
+
+                top: 0;
+                right: 0;
+
+                width:
+                    min(390px, 92vw);
+
+                height: 100vh;
+
+                background:
+                    #0a0f16;
+
+                border-left:
+                    1px solid
+                    rgba(255,255,255,0.08);
+
+                box-shadow:
+                    -20px 0 60px
+                    rgba(0,0,0,0.35);
+
+                transform:
+                    translateX(100%);
+
+                transition:
+                    transform 0.3s
+                    cubic-bezier(.22,.61,.36,1);
+
+                z-index: 50;
+
+                display: flex;
+
+                flex-direction: column;
+
+            }
+
+
+            .recent-panel.open {
+
+                transform:
+                    translateX(0);
+
+            }
+
+
+            /* =================================================
+               RECENT HEADER
+            ================================================= */
+
+            .recent-header {
+
+                display: flex;
+
+                align-items: flex-start;
+                justify-content: space-between;
+
+                gap: 15px;
+
+                padding:
+                    24px 20px;
+
+                border-bottom:
+                    1px solid
+                    rgba(255,255,255,0.07);
+
+            }
+
+
+            .recent-header h2 {
+
+                font-size: 17px;
+
+                color: #ffffff;
+
+                font-weight: 700;
+
+            }
+
+
+            .recent-header p {
+
+                margin-top: 5px;
+
+                color: #697688;
+
+                font-size: 11px;
+
+            }
+
+
+            .recent-close {
+
+                width: 34px;
+                height: 34px;
+
+                border: none;
+
+                border-radius: 10px;
+
+                background:
+                    rgba(255,255,255,0.05);
+
+                color: #8995a5;
+
+                cursor: pointer;
+
+                font-size: 15px;
+
+                transition:
+                    0.2s ease;
+
+            }
+
+
+            .recent-close:hover {
+
+                background:
+                    rgba(255,255,255,0.10);
+
+                color: #ffffff;
+
+            }
+
+
+            /* =================================================
+               RECENT LIST
+            ================================================= */
+
+            .recent-list {
+
+                flex: 1;
+
+                min-height: 0;
+
+                overflow-y: auto;
+
+                padding: 14px;
+
+                scrollbar-width: thin;
+
+                scrollbar-color:
+                    rgba(255,255,255,0.18)
+                    transparent;
+
+            }
+
+
+            .recent-list::-webkit-scrollbar {
+                width: 6px;
+            }
+
+
+            .recent-list::-webkit-scrollbar-thumb {
+
+                background:
+                    rgba(255,255,255,0.16);
+
+                border-radius: 10px;
+
+            }
+
+
+            .recent-item {
+
+                display: flex;
+
+                align-items: center;
+
+                gap: 10px;
+
+                padding: 13px;
+
+                margin-bottom: 7px;
+
+                border-radius: 12px;
+
+                background:
+                    rgba(255,255,255,0.035);
+
+                border:
+                    1px solid
+                    rgba(255,255,255,0.055);
+
+                transition:
+                    0.2s ease;
+
+            }
+
+
+            .recent-item:hover {
+
+                background:
+                    rgba(255,255,255,0.065);
+
+                border-color:
+                    rgba(255,255,255,0.10);
+
+            }
+
+
+            .recent-item-content {
+
+                flex: 1;
+
+                min-width: 0;
+
+            }
+
+
+            .recent-query {
+
+                color: #dce3eb;
+
+                font-size: 13px;
+
+                line-height: 1.45;
+
+                overflow-wrap: anywhere;
+
+            }
+
+
+            .recent-location {
+
+                margin-top: 6px;
+
+                color: #48caff;
+
+                font-size: 11px;
+
+            }
+
+
+            .recent-delete {
+
+                width: 30px;
+                height: 30px;
+
+                flex-shrink: 0;
+
+                border: none;
+
+                border-radius: 8px;
+
+                background:
+                    transparent;
+
+                color: #687587;
+
+                cursor: pointer;
+
+                transition:
+                    0.2s ease;
+
+            }
+
+
+            .recent-delete:hover {
+
+                background:
+                    rgba(255,70,70,0.10);
+
+                color: #ff8585;
+
+            }
+
+
+            /* =================================================
+               EMPTY RECENT
+            ================================================= */
+
+            .recent-empty {
+
+                min-height: 260px;
+
+                display: flex;
+
+                flex-direction: column;
+
+                align-items: center;
+                justify-content: center;
+
+                text-align: center;
+
+                color: #687587;
+
+            }
+
+
+            .recent-empty-icon {
+
+                width: 55px;
+                height: 55px;
+
+                margin-bottom: 14px;
+
+                display: flex;
+                align-items: center;
+                justify-content: center;
+
+                border-radius: 17px;
+
+                background:
+                    rgba(255,255,255,0.045);
+
+                font-size: 24px;
+
+            }
+
+
+            .recent-empty p {
+
+                color: #b1bbc7;
+
+                font-size: 13px;
+
+            }
+
+
+            .recent-empty span {
+
+                margin-top: 6px;
+
+                font-size: 11px;
+
+                color: #5e6a7a;
+
+            }
+
+
+            /* =================================================
+               MOBILE INPUT
+            ================================================= */
+
+            @media (max-width: 700px) {
+
+                .input-area {
+
+                    padding:
+                        14px 12px 17px;
+
+                }
+
+
+                .input-footer {
+
+                    font-size: 9px;
+
+                    padding-left: 3px;
+
+                    padding-right: 3px;
+
+                }
+
+
+                .input-footer span:last-child {
+
+                    display: none;
+
+                }
+
+
+                #sendButton {
+
+                    width: 40px;
+                    height: 40px;
+
+                }
+
+
+                .recent-panel {
+
+                    width:
+                        min(360px, 92vw);
+
+                }
+
+            }
+
+        </style>
+        <script>
+
+            /* =================================================
+               ELEMENTS
+            ================================================= */
+
+            const messageInput =
+                document.getElementById("messageInput");
+
+            const sendButton =
+                document.getElementById("sendButton");
+
+            const chatArea =
+                document.getElementById("chatArea");
+
+            const recentPanel =
+                document.getElementById("recentPanel");
+
+            const recentOverlay =
+                document.getElementById("recentOverlay");
+
+
+            /* =================================================
+               SEND MESSAGE
+            ================================================= */
+
+            function sendMessage() {
+
+                const message =
+                    messageInput.value.trim();
+
+                if (!message) {
+                    return;
+                }
+
+
+                removeWelcome();
+
+
+                addUserMessage(message);
+
+
+                messageInput.value = "";
+
+                messageInput.style.height =
+                    "auto";
+
+
+                sendButton.disabled = true;
+
+
+                showTyping();
+
+
+                fetch(
+                    "/chatbot/api/?message="
+                    + encodeURIComponent(message)
+                )
+
+                .then(function(response) {
+
+                    if (!response.ok) {
+                        throw new Error(
+                            "Server error"
+                        );
+                    }
+
+                    return response.json();
+
+                })
+
+                .then(function(data) {
+
+                    hideTyping();
+
+                    sendButton.disabled = false;
+
+
+                    if (data.reply) {
+
+                        addBotMessage(
+                            data.reply
+                        );
+
+                    } else {
+
+                        addBotMessage(
+                            "Sorry, I couldn't process that request."
+                        );
+
+                    }
+
+                })
+
+                .catch(function(error) {
+
+                    console.error(error);
+
+                    hideTyping();
+
+                    sendButton.disabled = false;
+
+
+                    addBotMessage(
+                        "⚠️ I couldn't connect to the weather service right now. Please try again."
+                    );
+
+                });
+
+            }
+
+
+            /* =================================================
+               REMOVE WELCOME SCREEN
+            ================================================= */
+
+            function removeWelcome() {
+
+                const welcome =
+                    document.querySelector(
+                        ".welcome-screen"
+                    );
+
+                if (welcome) {
+                    welcome.remove();
+                }
+
+            }
+
+
+            /* =================================================
+               USER MESSAGE
+            ================================================= */
+
+            function addUserMessage(message) {
+
+                const messageDiv =
+                    document.createElement("div");
+
+                messageDiv.className =
+                    "message user";
+
+
+                messageDiv.innerHTML = `
+
+                    <div class="message-content">
+
+                        <div class="sender">
+                            You
+                        </div>
+
+                        <div class="bubble">
+                            ${escapeHtml(message)}
+                        </div>
+
+                    </div>
+
+
+                    <div class="avatar user-avatar">
+                        👤
+                    </div>
+
+                `;
+
+
+                chatArea.appendChild(
+                    messageDiv
+                );
+
+
+                scrollToBottom();
+
+            }
+
+
+            /* =================================================
+               AI MESSAGE
+            ================================================= */
+
+            function addBotMessage(message) {
+
+                const messageDiv =
+                    document.createElement("div");
+
+                messageDiv.className =
+                    "message bot";
+
+
+                messageDiv.innerHTML = `
+
+                    <div class="avatar bot-avatar">
+                        🤖
+                    </div>
+
+
+                    <div class="message-content">
+
+                        <div class="sender">
+                            WeatherGPT
+                        </div>
+
+                        <div class="bubble">
+                            ${message}
+                        </div>
+
+                    </div>
+
+                `;
+
+
+                chatArea.appendChild(
+                    messageDiv
+                );
+
+
+                scrollToBottom();
+
+            }
+
+
+            /* =================================================
+               TYPING INDICATOR
+            ================================================= */
+
+            function showTyping() {
+
+                if (
+                    document.getElementById(
+                        "typingMessage"
+                    )
+                ) {
+                    return;
+                }
+
+
+                const typing =
+                    document.createElement(
+                        "div"
+                    );
+
+                typing.id =
+                    "typingMessage";
+
+                typing.className =
+                    "message bot";
+
+
+                typing.innerHTML = `
+
+                    <div class="avatar bot-avatar">
+                        🤖
+                    </div>
+
+
+                    <div class="message-content">
+
+                        <div class="sender">
+                            WeatherGPT
+                        </div>
+
+
+                        <div class="bubble typing-bubble">
+
+                            <span></span>
+                            <span></span>
+                            <span></span>
+
+                        </div>
+
+                    </div>
+
+                `;
+
+
+                chatArea.appendChild(
+                    typing
+                );
+
+
+                scrollToBottom();
+
+            }
+
+
+            function hideTyping() {
+
+                const typing =
+                    document.getElementById(
+                        "typingMessage"
+                    );
+
+                if (typing) {
+                    typing.remove();
+                }
+
+            }
+
+
+            /* =================================================
+               SCROLL
+            ================================================= */
+
+            function scrollToBottom() {
+
+                requestAnimationFrame(
+                    function() {
+
+                        chatArea.scrollTop =
+                            chatArea.scrollHeight;
+
+                    }
+                );
+
+            }
+
+
+            /* =================================================
+               TEXTAREA AUTO RESIZE
+            ================================================= */
+
+            messageInput.addEventListener(
+                "input",
+                function() {
+
+                    this.style.height =
+                        "auto";
+
+                    this.style.height =
+                        Math.min(
+                            this.scrollHeight,
+                            130
+                        ) + "px";
+
+                }
+            );
+
+
+            /* =================================================
+               ENTER TO SEND
+            ================================================= */
+
+            messageInput.addEventListener(
+                "keydown",
+                function(event) {
+
+                    if (
+                        event.key === "Enter"
+                        && !event.shiftKey
+                    ) {
+
+                        event.preventDefault();
+
+                        sendMessage();
+
+                    }
+
+                }
+            );
+
+
+            /* =================================================
+               RECENT PANEL
+            ================================================= */
+
+            function openRecent() {
+
+                recentPanel.classList.add(
+                    "open"
+                );
+
+                recentOverlay.classList.add(
+                    "show"
+                );
+
+            }
+
+
+            function closeRecent() {
+
+                recentPanel.classList.remove(
+                    "open"
+                );
+
+                recentOverlay.classList.remove(
+                    "show"
+                );
+
+            }
+
+
+            /* =================================================
+               DELETE RECENT SEARCH
+            ================================================= */
+
+            document.addEventListener(
+                "click",
+                function(event) {
+
+                    const button =
+                        event.target.closest(
+                            ".recent-delete"
+                        );
+
+                    if (!button) {
+                        return;
+                    }
+
+
+                    deleteRecentSearch(
+                        button.dataset.searchId
+                    );
+
+                }
+            );
+
+
+            function deleteRecentSearch(
+                searchId
+            ) {
+
+                fetch(
+                    "/chatbot/delete-search/"
+                    + searchId
+                    + "/",
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "X-CSRFToken":
+                                getCookie(
+                                    "csrftoken"
+                                )
+                        }
+                    }
+                )
+
+                .then(function(response) {
+
+                    return response.json();
+
+                })
+
+                .then(function(data) {
+
+                    if (data.success) {
+
+                        const item =
+                            document.getElementById(
+                                "recent-"
+                                + searchId
+                            );
+
+                        if (item) {
+                            item.remove();
+                        }
+
+                    }
+
+                })
+
+                .catch(function(error) {
+
+                    console.error(error);
+
+                });
+
+            }
+
+
+            /* =================================================
+               CLEAR CHAT HISTORY
+            ================================================= */
+
+            function clearChats() {
+
+                fetch(
+                    "/chatbot/clear-chats/",
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "X-CSRFToken":
+                                getCookie(
+                                    "csrftoken"
+                                )
+                        }
+                    }
+                )
+
+                .then(function(response) {
+
+                    return response.json();
+
+                })
+
+                .then(function(data) {
+
+                    if (data.success) {
+
+                        newChat();
+
+                    }
+
+                })
+
+                .catch(function(error) {
+
+                    console.error(error);
+
+                });
+
+            }
+
+
+            /* =================================================
+               NEW CHAT
+            ================================================= */
+
+            function newChat() {
+
+                chatArea.innerHTML = "";
+
+                messageInput.value = "";
+
+                messageInput.style.height =
+                    "auto";
+
+                sendButton.disabled = false;
+
+                hideTyping();
+
+                closeRecent();
+
+                messageInput.focus();
+
+
+                const welcome =
+                    document.createElement(
+                        "div"
+                    );
+
+                welcome.className =
+                    "welcome-screen";
+
+
+                welcome.innerHTML = `
+
+                    <div class="welcome-icon">
+                        🌦️
+                    </div>
+
+
+                    <h1>
+                        How can I help with the weather?
+                    </h1>
+
+
+                    <p>
+                        Ask me naturally about weather,
+                        temperature, rain, wind,
+                        forecasts, alerts or climate.
+                    </p>
+
+                `;
+
+
+                chatArea.appendChild(
+                    welcome
+                );
+
+            }
+
+
+            /* =================================================
+               ESCAPE USER TEXT
+            ================================================= */
+
+            function escapeHtml(text) {
+
+                const div =
+                    document.createElement(
+                        "div"
+                    );
+
+                div.textContent = text;
+
+                return div.innerHTML;
+
+            }
+
+
+            /* =================================================
+               CSRF COOKIE
+            ================================================= */
+
+            function getCookie(name) {
+
+                let cookieValue = null;
+
+
+                if (
+                    document.cookie
+                    && document.cookie !== ""
+                ) {
+
+                    const cookies =
+                        document.cookie.split(
+                            ";"
+                        );
+
+
+                    for (
+                        let cookie of cookies
+                    ) {
+
+                        cookie =
+                            cookie.trim();
+
+
+                        if (
+                            cookie.substring(
+                                0,
+                                name.length + 1
+                            )
+                            === name + "="
+                        ) {
+
+                            cookieValue =
+                                decodeURIComponent(
+                                    cookie.substring(
+                                        name.length + 1
+                                    )
+                                );
+
+                            break;
+
+                        }
+
+                    }
+
+                }
+
+
+                return cookieValue;
+
+            }
+
+
+            /* =================================================
+               INITIAL LOAD
+            ================================================= */
+
+            window.addEventListener(
+                "load",
+                function() {
+
+                    closeRecent();
+
+                    messageInput.focus();
+
+                }
+            );
+
+
+            /* =================================================
+               ESC KEY CLOSES RECENT
+            ================================================= */
+
+            document.addEventListener(
+                "keydown",
+                function(event) {
+
+                    if (
+                        event.key === "Escape"
+                    ) {
+
+                        closeRecent();
+
+                    }
+
+                }
+            );
+
+        </script>
+        <!-- =====================================================
+             FINAL CLOSING
+        ===================================================== -->
+
+    </main>
+
+</div>
+
+
+</body>
+
+</html>

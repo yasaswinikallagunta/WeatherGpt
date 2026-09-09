@@ -1,0 +1,356 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}WeatherGPT{% endblock %}</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+    font-family:Inter,Segoe UI,Arial,sans-serif;
+    min-height:100vh;color:#fff;overflow-x:hidden;
+    background:
+      radial-gradient(circle at 10% 10%,rgba(20,200,255,.16),transparent 28%),
+      radial-gradient(circle at 90% 80%,rgba(95,80,255,.16),transparent 30%),
+      linear-gradient(135deg,#03111f,#061c31,#03101d);
+    transition:.35s;
+}
+a{text-decoration:none;color:inherit}
+button{font-family:inherit}
+body.light{
+    color:#10243a;
+    background:
+      radial-gradient(circle at 10% 10%,rgba(20,190,255,.14),transparent 28%),
+      linear-gradient(135deg,#eef9ff,#dceeff,#f8fcff);
+}
+
+/* Animated background */
+.bg{position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:-2}
+.glow{
+    position:absolute;width:430px;height:430px;border-radius:50%;
+    background:radial-gradient(circle,rgba(20,205,255,.18),transparent 65%);
+    top:-160px;right:-100px;animation:pulse 7s infinite;
+}
+@keyframes pulse{50%{transform:scale(1.15);opacity:.8}}
+
+.cloud{
+    position:absolute;width:170px;height:48px;border-radius:50px;
+    background:rgba(255,255,255,.045);filter:blur(.3px);
+    animation:cloud 55s linear infinite;
+}
+.cloud:before,.cloud:after{
+    content:"";position:absolute;border-radius:50%;
+    background:rgba(255,255,255,.045)
+}
+.cloud:before{width:65px;height:65px;left:25px;bottom:12px}
+.cloud:after{width:85px;height:85px;right:20px;bottom:8px}
+.c1{top:10%;left:-220px}
+.c2{top:38%;left:-300px;transform:scale(.65);animation-duration:75s;animation-delay:12s}
+.c3{top:68%;left:-260px;transform:scale(.8);animation-duration:65s;animation-delay:25s}
+@keyframes cloud{to{left:110%}}
+
+.dots span{
+    position:absolute;width:4px;height:4px;border-radius:50%;
+    background:#42dfff;opacity:.45;animation:float 8s infinite
+}
+.dots span:nth-child(1){left:15%;top:20%}
+.dots span:nth-child(2){left:35%;top:70%;animation-delay:2s}
+.dots span:nth-child(3){left:55%;top:30%;animation-delay:4s}
+.dots span:nth-child(4){left:75%;top:65%;animation-delay:1s}
+.dots span:nth-child(5){left:88%;top:18%;animation-delay:3s}
+@keyframes float{
+    50%{transform:translateY(-35px) scale(1.7);opacity:1}
+}
+
+/* App */
+.app{display:flex;min-height:100vh}
+
+/* Sidebar */
+.sidebar{
+    position:fixed;left:0;top:0;bottom:0;width:260px;
+    padding:23px 16px;
+    background:rgba(3,19,35,.92);
+    border-right:1px solid rgba(255,255,255,.08);
+    backdrop-filter:blur(24px);
+    box-shadow:12px 0 45px rgba(0,0,0,.2);
+    z-index:100;display:flex;flex-direction:column;
+    animation:slide .7s ease
+}
+@keyframes slide{from{transform:translateX(-100%)}to{transform:translateX(0)}}
+
+.logo{display:flex;align-items:center;gap:11px;padding:7px 9px;margin-bottom:35px}
+.logo-icon{
+    width:49px;height:49px;border-radius:15px;
+    display:grid;place-items:center;font-size:26px;
+    background:linear-gradient(135deg,#17d8ff,#4b72ff,#7954ff);
+    box-shadow:0 10px 30px rgba(35,190,255,.3);
+    animation:logo 4s ease-in-out infinite
+}
+@keyframes logo{50%{transform:translateY(-5px);box-shadow:0 15px 40px rgba(35,190,255,.5)}}
+.logo h1{
+    font-size:20px;
+    background:linear-gradient(90deg,#fff,#78dcff);
+    background-clip:text;
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+}
+.logo p{font-size:9px;color:#7895af;letter-spacing:1px;margin-top:3px}
+
+.label{
+    font-size:10px;color:#5e7b96;letter-spacing:1.5px;
+    text-transform:uppercase;margin:0 12px 11px
+}
+.nav{display:flex;flex-direction:column;gap:5px}
+.nav a{
+    position:relative;display:flex;align-items:center;gap:12px;
+    padding:12px 13px;border-radius:13px;
+    color:#8da8c0;font-size:14px;transition:.3s
+}
+.nav a:before{
+    content:"";position:absolute;left:0;width:3px;height:0;
+    border-radius:8px;background:linear-gradient(#2bdcff,#6570ff);
+    transition:.3s
+}
+.nav a:hover,.nav a.active{
+    color:#fff;transform:translateX(4px);
+    background:linear-gradient(90deg,rgba(30,205,255,.15),rgba(85,90,255,.07))
+}
+.nav a:hover:before,.nav a.active:before{height:60%}
+.icon{width:25px;text-align:center;font-size:18px}
+.nav a:hover .icon{transform:scale(1.15)}
+.bottom{margin-top:auto;display:flex;flex-direction:column;gap:5px}
+.logout{color:#ff9494!important}
+.logout:hover{background:rgba(255,70,70,.08)!important}
+
+/* Main */
+.main{margin-left:260px;width:calc(100% - 260px);min-height:100vh}
+.topbar{
+    height:80px;padding:0 35px;display:flex;align-items:center;
+    justify-content:space-between;position:sticky;top:0;z-index:50;
+    background:rgba(3,17,31,.68);
+    border-bottom:1px solid rgba(255,255,255,.07);
+    backdrop-filter:blur(20px)
+}
+.page h2{font-size:21px}
+.page p{font-size:11px;color:#7190aa;margin-top:4px}
+.actions{display:flex;align-items:center;gap:10px}
+.icon-btn{
+    width:40px;height:40px;border-radius:12px;
+    border:1px solid rgba(255,255,255,.08);
+    background:rgba(255,255,255,.045);color:#c0d5e8;
+    cursor:pointer;font-size:17px;transition:.3s
+}
+.icon-btn:hover{
+    transform:translateY(-2px);color:#fff;
+    border-color:rgba(35,205,255,.35);
+    background:rgba(35,205,255,.1)
+}
+.user{display:flex;align-items:center;gap:9px;padding-left:8px}
+.avatar{
+    width:42px;height:42px;border-radius:13px;display:grid;place-items:center;
+    font-weight:800;background:linear-gradient(135deg,#18d0ff,#5d68ff);
+    box-shadow:0 7px 25px rgba(40,150,255,.25)
+}
+.user strong{display:block;font-size:12px}
+.user small{display:block;color:#68859f;font-size:9px;margin-top:2px}
+
+/* Content + cards */
+.content{padding:35px;position:relative;z-index:2;animation:appear .6s ease}
+@keyframes appear{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.glass{
+    background:linear-gradient(145deg,rgba(255,255,255,.075),rgba(255,255,255,.025));
+    border:1px solid rgba(255,255,255,.09);
+    border-radius:21px;backdrop-filter:blur(18px);
+    box-shadow:0 20px 55px rgba(0,0,0,.18);
+    transition:.35s
+}
+.glass:hover{transform:translateY(-3px);border-color:rgba(60,210,255,.2)}
+.mobile{display:none}
+
+/* Responsive */
+@media(max-width:850px){
+    .sidebar{width:72px;padding:20px 9px}
+    .logo{justify-content:center;padding:5px}
+    .logo-text,.label,.nav span,.bottom span{display:none}
+    .nav a{justify-content:center;padding:13px 7px}
+    .nav a:before{display:none}
+    .main{margin-left:72px;width:calc(100% - 72px)}
+    .topbar{padding:0 20px}
+    .content{padding:22px 18px}
+    .user-text{display:none}
+}
+@media(max-width:520px){
+    .topbar{height:70px}
+    .page h2{font-size:18px}
+    .page p{display:none}
+    .actions .icon-btn:first-child{display:none}
+    .content{padding:17px 12px}
+}
+
+/* Light mode */
+body.light .sidebar{background:rgba(255,255,255,.82);border-color:rgba(20,60,90,.1)}
+body.light .topbar{background:rgba(255,255,255,.7);border-color:rgba(20,60,90,.08)}
+body.light .nav a{color:#57728a}
+body.light .nav a:hover,body.light .nav a.active{color:#12304a;background:rgba(30,180,240,.1)}
+body.light .page p,body.light .logo p{color:#648198}
+body.light .glass{background:rgba(255,255,255,.6);border-color:rgba(20,80,120,.1)}
+</style>
+
+{% block extra_css %}{% endblock %}
+</head>
+
+<body>
+
+<!-- Animated weather background -->
+<div class="bg">
+    <div class="glow"></div>
+    <div class="cloud c1"></div>
+    <div class="cloud c2"></div>
+    <div class="cloud c3"></div>
+    <div class="dots">
+        <span></span><span></span><span></span><span></span><span></span>
+    </div>
+</div>
+
+<div class="app">
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+
+    <div class="logo">
+        <div class="logo-icon">🌦️</div>
+        <div class="logo-text">
+            <h1>WeatherGPT</h1>
+            <p>AI WEATHER ASSISTANT</p>
+        </div>
+    </div>
+
+    <div class="label">Main Menu</div>
+
+    <nav class="nav">
+
+        <a href="{% url 'home' %}" class="active">
+            <div class="icon">🏠</div>
+            <span>Home</span>
+        </a>
+
+        <a href="#">
+            <div class="icon">🌤️</div>
+            <span>Weather</span>
+        </a>
+
+        <a href="#">
+            <div class="icon">📊</div>
+            <span>Forecast</span>
+        </a>
+
+        <a href="#">
+            <div class="icon">⚠️</div>
+            <span>Alerts</span>
+        </a>
+
+        <a href="#">
+            <div class="icon">🌍</div>
+            <span>Climate</span>
+        </a>
+
+        <a href="#">
+            <div class="icon">🤖</div>
+            <span>AI Chatbot</span>
+        </a>
+
+    </nav>
+
+    <div class="bottom">
+
+        <a href="#" class="nav">
+            <div class="icon">👤</div>
+            <span>Profile</span>
+        </a>
+
+        <a href="{% url 'logout' %}" class="nav logout">
+            <div class="icon">🚪</div>
+            <span>Logout</span>
+        </a>
+
+    </div>
+
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+
+    <header class="topbar">
+
+        <div class="page">
+            <h2>{% block page_title %}Dashboard{% endblock %}</h2>
+            <p>Intelligent weather insights powered by AI</p>
+        </div>
+
+        <div class="actions">
+
+            <button class="icon-btn" onclick="toggleTheme()" title="Theme">
+                🌙
+            </button>
+
+            <button class="icon-btn" title="Notifications">
+                🔔
+            </button>
+
+            <div class="user">
+
+                <div class="avatar">
+                    {{ user.first_name|first|upper }}
+                </div>
+
+                <div class="user-text">
+                    <strong>{{ user.first_name }} {{ user.last_name }}</strong>
+                    <small>Weather Explorer</small>
+                </div>
+
+            </div>
+
+        </div>
+
+    </header>
+
+    <section class="content">
+        {% block content %}
+        {% endblock %}
+    </section>
+
+</main>
+
+</div>
+
+<script>
+function toggleTheme(){
+    document.body.classList.toggle("light");
+
+    const btn=document.querySelector(".actions .icon-btn");
+
+    if(document.body.classList.contains("light")){
+        btn.innerHTML="☀️";
+        localStorage.setItem("weatherTheme","light");
+    }else{
+        btn.innerHTML="🌙";
+        localStorage.setItem("weatherTheme","dark");
+    }
+}
+
+document.addEventListener("DOMContentLoaded",function(){
+    if(localStorage.getItem("weatherTheme")==="light"){
+        document.body.classList.add("light");
+        const btn=document.querySelector(".actions .icon-btn");
+        if(btn) btn.innerHTML="☀️";
+    }
+});
+</script>
+
+{% block extra_js %}{% endblock %}
+
+</body>
+</html>

@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>My Profile | WeatherGPT</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            min-height: 100vh;
+            background:
+                radial-gradient(
+                    circle at 15% 20%,
+                    rgba(0, 174, 255, 0.10),
+                    transparent 30%
+                ),
+                radial-gradient(
+                    circle at 85% 80%,
+                    rgba(0, 119, 255, 0.08),
+                    transparent 30%
+                ),
+                #05080d;
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+
+        .page {
+            min-height: 100vh;
+            padding: 25px;
+        }
+
+        .topbar {
+            width: 100%;
+            max-width: 1100px;
+            margin: 0 auto 25px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .brand-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 183, 255, 0.12);
+            border: 1px solid rgba(0, 183, 255, 0.25);
+            font-size: 21px;
+        }
+
+        .brand-text {
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+        }
+
+        .dashboard-btn {
+            text-decoration: none;
+            color: #dbe8f2;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.10);
+            padding: 10px 18px;
+            border-radius: 10px;
+            font-size: 13px;
+            transition: 0.25s ease;
+        }
+
+        .dashboard-btn:hover {
+            background: rgba(0, 183, 255, 0.12);
+            border-color: rgba(0, 183, 255, 0.30);
+            color: #5fd4ff;
+            transform: translateY(-1px);
+        }
+
+        .profile-container {
+            width: 100%;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .profile-card {
+            background: rgba(12, 17, 25, 0.88);
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            border-radius: 22px;
+            padding: 38px;
+            box-shadow:
+                0 25px 80px rgba(0, 0, 0, 0.45),
+                inset 0 1px 0 rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+        }
+
+        .profile-heading {
+            margin-bottom: 35px;
+        }
+
+        .profile-heading h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .profile-heading p {
+            color: #7e8b9a;
+            font-size: 14px;
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 22px;
+            padding-bottom: 30px;
+            margin-bottom: 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+        }
+
+        .profile-avatar {
+            width: 92px;
+            height: 92px;
+            border-radius: 50%;
+            overflow: hidden;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(
+                135deg,
+                rgba(0, 183, 255, 0.20),
+                rgba(75, 88, 255, 0.20)
+            );
+            border: 2px solid rgba(0, 183, 255, 0.30);
+            font-size: 38px;
+        }
+
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .profile-name h2 {
+            font-size: 22px;
+            margin-bottom: 6px;
+        }
+
+        .profile-name p {
+            color: #7e8b9a;
+            font-size: 13px;
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .detail-box {
+            background: rgba(255, 255, 255, 0.035);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            border-radius: 13px;
+            padding: 18px;
+            transition: 0.2s ease;
+        }
+
+        .detail-box:hover {
+            border-color: rgba(0, 183, 255, 0.18);
+            background: rgba(0, 183, 255, 0.04);
+        }
+
+        .detail-label {
+            display: block;
+            color: #718092;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 8px;
+        }
+
+        .detail-value {
+            color: #edf5fa;
+            font-size: 15px;
+            font-weight: 500;
+            word-break: break-word;
+        }
+
+        .actions {
+            margin-top: 28px;
+            display: flex;
+            justify-content: flex-end;
+        }
+        .profile-dashboard-btn {
+    text-decoration: none;
+    border-radius: 11px;
+    padding: 12px 20px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    color: #dbe8f2;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.25s ease;
+}
+
+.profile-dashboard-btn:hover {
+    background: rgba(0, 183, 255, 0.10);
+    border-color: rgba(0, 183, 255, 0.30);
+    color: #5fd4ff;
+    transform: translateY(-2px);
+}
+        .edit-btn {
+            border: none;
+            border-radius: 11px;
+            padding: 12px 20px;
+            background: linear-gradient(
+                135deg,
+                #008fd1,
+                #0066b3
+            );
+            color: white;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.25s ease;
+            box-shadow:
+                0 8px 25px rgba(0, 140, 210, 0.20);
+        }
+
+        .edit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow:
+                0 12px 30px rgba(0, 140, 210, 0.30);
+        }
+
+        .edit-form {
+            margin-top: 30px;
+            padding: 28px;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.025);
+            border: 1px solid rgba(0, 183, 255, 0.15);
+            animation: showForm 0.3s ease;
+        }
+
+        @keyframes showForm {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .edit-form-title {
+            margin-bottom: 25px;
+        }
+
+        .edit-form-title h2 {
+            font-size: 20px;
+            margin-bottom: 6px;
+        }
+
+        .edit-form-title p {
+            color: #788596;
+            font-size: 13px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 18px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            color: #9ba8b7;
+            font-size: 12px;
+            margin-bottom: 8px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 13px 14px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.10);
+            outline: none;
+            background: rgba(0, 0, 0, 0.25);
+            color: #ffffff;
+            font-size: 13px;
+            transition: 0.2s ease;
+        }
+
+        .form-group input:focus {
+            border-color: rgba(0, 183, 255, 0.55);
+            box-shadow:
+                0 0 0 3px rgba(0, 183, 255, 0.08);
+        }
+
+        .form-group small {
+            color: #687789;
+            font-size: 11px;
+            margin-top: 7px;
+        }
+
+        .profile-image-group {
+            grid-column: 1 / -1;
+        }
+
+        .profile-image-edit {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            flex-wrap: wrap;
+        }
+
+        .edit-profile-image,
+        .edit-profile-placeholder {
+            width: 82px;
+            height: 82px;
+            border-radius: 50%;
+        }
+
+        .edit-profile-image {
+            object-fit: cover;
+            border: 2px solid rgba(0, 183, 255, 0.30);
+        }
+
+        .edit-profile-placeholder {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 183, 255, 0.10);
+            border: 2px solid rgba(0, 183, 255, 0.20);
+            font-size: 32px;
+        }
+
+        .upload-image-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 11px 17px;
+            border-radius: 10px;
+            background: rgba(0, 183, 255, 0.10);
+            border: 1px solid rgba(0, 183, 255, 0.22);
+            color: #55ceff;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s ease;
+        }
+
+        .upload-image-btn:hover {
+            background: rgba(0, 183, 255, 0.17);
+            border-color: rgba(0, 183, 255, 0.40);
+        }
+
+        .edit-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 25px;
+        }
+
+        .cancel-btn,
+        .save-btn {
+            border: none;
+            border-radius: 10px;
+            padding: 11px 18px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s ease;
+        }
+
+        .cancel-btn {
+            background: rgba(255, 255, 255, 0.06);
+            color: #aab5c1;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .cancel-btn:hover {
+            background: rgba(255, 255, 255, 0.10);
+        }
+
+        .save-btn {
+            background: linear-gradient(
+                135deg,
+                #009bdc,
+                #006bb8
+            );
+            color: #ffffff;
+            box-shadow:
+                0 7px 20px rgba(0, 140, 210, 0.18);
+        }
+
+        .save-btn:hover {
+            transform: translateY(-1px);
+            box-shadow:
+                0 10px 25px rgba(0, 140, 210, 0.28);
+        }
+
+        .messages {
+            margin-bottom: 20px;
+        }
+
+        .message {
+            padding: 12px 15px;
+            border-radius: 10px;
+            background: rgba(0, 183, 255, 0.08);
+            border: 1px solid rgba(0, 183, 255, 0.15);
+            color: #bdeeff;
+            font-size: 13px;
+        }
+
+        @media (max-width: 700px) {
+
+            .page {
+                padding: 15px;
+            }
+
+            .profile-card {
+                padding: 24px 18px;
+                border-radius: 17px;
+            }
+
+            .topbar {
+                margin-bottom: 18px;
+            }
+
+            .brand-text {
+                font-size: 15px;
+            }
+
+            .dashboard-btn {
+                padding: 9px 12px;
+                font-size: 11px;
+            }
+
+            .profile-heading h1 {
+                font-size: 23px;
+            }
+
+            .profile-header {
+                align-items: flex-start;
+            }
+
+            .profile-avatar {
+                width: 75px;
+                height: 75px;
+            }
+
+            .profile-name h2 {
+                font-size: 18px;
+            }
+
+            .details-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .profile-image-group {
+                grid-column: auto;
+            }
+
+            .edit-form {
+                padding: 20px 15px;
+            }
+
+            .actions {
+                justify-content: stretch;
+            }
+
+            .edit-btn {
+                width: 100%;
+            }
+
+            .edit-actions {
+                flex-direction: column-reverse;
+            }
+
+            .cancel-btn,
+            .save-btn {
+                width: 100%;
+            }
+        }
+        </style>
+</head>
+
+<body>
+
+<div class="page">
+
+    <div class="topbar">
+
+        <div class="brand">
+            <div class="brand-icon">🌦️</div>
+            <div class="brand-text">WeatherGPT</div>
+        </div>
+
+        <a href="{% url 'home' %}" class="dashboard-btn">
+            ← Dashboard
+        </a>
+
+    </div>
+
+
+    <div class="profile-container">
+
+        <div class="profile-card">
+
+            <div class="profile-heading">
+                <h1>My Profile</h1>
+                <p>Your WeatherGPT account details</p>
+            </div>
+
+
+            {% if messages %}
+                <div class="messages">
+                    {% for message in messages %}
+                        <div class="message">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+
+            <div class="profile-header">
+
+                <div class="profile-avatar">
+
+                    {% if request.user.userprofile.profile_image %}
+
+                        <img
+                            src="{{ request.user.userprofile.profile_image.url }}"
+                            alt="Profile Image"
+                        >
+
+                    {% else %}
+
+                        👤
+
+                    {% endif %}
+
+                </div>
+
+
+                <div class="profile-name">
+
+                    <h2>
+                        {{ request.user.first_name }}
+                        {{ request.user.last_name }}
+                    </h2>
+
+                    <p>{{ request.user.email }}</p>
+
+                </div>
+
+            </div>
+
+
+            <div class="details-grid">
+
+                <div class="detail-box">
+
+                    <span class="detail-label">
+                        Name
+                    </span>
+
+                    <div class="detail-value">
+                        {{ request.user.first_name }}
+                        {{ request.user.last_name }}
+                    </div>
+
+                </div>
+
+
+                <div class="detail-box">
+
+                    <span class="detail-label">
+                        Email
+                    </span>
+
+                    <div class="detail-value">
+                        {{ request.user.email }}
+                    </div>
+
+                </div>
+
+
+                <div class="detail-box">
+
+                    <span class="detail-label">
+                        Phone Number
+                    </span>
+
+                    <div class="detail-value">
+                        {{ request.user.userprofile.phone }}
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="actions">
+
+    <a href="{% url 'home' %}" class="profile-dashboard-btn">
+        🏠 Dashboard
+    </a>
+
+    <button
+        type="button"
+        class="edit-btn"
+        onclick="openEditProfile()"
+    >
+        ✏️ Edit Profile
+    </button>
+
+</div>
+
+
+            <div
+                class="edit-form"
+                id="editForm"
+                style="display: none;"
+            >
+
+                <div class="edit-form-title">
+
+                    <h2>Edit Profile</h2>
+
+                    <p>
+                        Update your account details
+                    </p>
+
+                </div>
+
+
+                <form
+                    method="POST"
+                    action="{% url 'profile' %}"
+                    enctype="multipart/form-data"
+                >
+
+                    {% csrf_token %}
+
+
+                    <div class="form-grid">
+
+
+                        <div class="form-group profile-image-group">
+
+                            <label>
+                                Profile Image
+                            </label>
+
+
+                            <div class="profile-image-edit">
+
+                                {% if request.user.userprofile.profile_image %}
+
+                                    <img
+                                        src="{{ request.user.userprofile.profile_image.url }}"
+                                        alt="Profile Image"
+                                        class="edit-profile-image"
+                                        id="profilePreview"
+                                    >
+
+                                    <div
+                                        class="edit-profile-placeholder"
+                                        id="profilePlaceholder"
+                                        style="display: none;"
+                                    >
+                                        👤
+                                    </div>
+
+                                {% else %}
+
+                                    <div
+                                        class="edit-profile-placeholder"
+                                        id="profilePlaceholder"
+                                    >
+                                        👤
+                                    </div>
+
+                                    <img
+                                        src=""
+                                        alt="Profile Preview"
+                                        class="edit-profile-image"
+                                        id="profilePreview"
+                                        style="display: none;"
+                                    >
+
+                                {% endif %}
+
+
+                                <label
+                                    for="profileImageInput"
+                                    class="upload-image-btn"
+                                >
+                                    📷 Choose Image
+                                </label>
+
+
+                                <input
+                                    type="file"
+                                    name="profile_image"
+                                    id="profileImageInput"
+                                    accept="image/*"
+                                    style="display: none;"
+                                >
+
+                            </div>
+
+
+                            <small>
+                                Upload a JPG, PNG or WebP image.
+                            </small>
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label>
+                                First Name
+                            </label>
+
+                            <input
+                                type="text"
+                                name="first_name"
+                                value="{{ request.user.first_name }}"
+                                required
+                            >
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label>
+                                Last Name
+                            </label>
+
+                            <input
+                                type="text"
+                                name="last_name"
+                                value="{{ request.user.last_name }}"
+                                required
+                            >
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label>
+                                Email
+                            </label>
+
+                            <input
+                                type="email"
+                                name="email"
+                                value="{{ request.user.email }}"
+                                required
+                            >
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label>
+                                Phone Number
+                            </label>
+
+                            <input
+                                type="text"
+                                name="phone"
+                                value="{{ request.user.userprofile.phone }}"
+                                maxlength="10"
+                                pattern="[0-9]{10}"
+                                required
+                            >
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="edit-actions">
+
+                        <button
+                            type="button"
+                            class="cancel-btn"
+                            onclick="closeEditProfile()"
+                        >
+                            Cancel
+                        </button>
+
+
+                        <button
+                            type="submit"
+                            class="save-btn"
+                        >
+                            💾 Save Changes
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+<script>
+
+    function openEditProfile() {
+        const editForm = document.getElementById("editForm");
+
+        if (editForm) {
+            editForm.style.display = "block";
+
+            editForm.scrollIntoView({
+                behavior: "smooth",
+                block: "start"
+            });
+        }
+    }
+
+
+    function closeEditProfile() {
+        const editForm = document.getElementById("editForm");
+
+        if (editForm) {
+            editForm.style.display = "none";
+        }
+    }
+
+
+    const profileImageInput =
+        document.getElementById("profileImageInput");
+
+
+    if (profileImageInput) {
+
+        profileImageInput.addEventListener(
+            "change",
+            function () {
+
+                const file = this.files[0];
+
+                if (!file) {
+                    return;
+                }
+
+
+                if (!file.type.startsWith("image/")) {
+                    alert("Please select a valid image.");
+                    this.value = "";
+                    return;
+                }
+
+
+                const reader = new FileReader();
+
+
+                reader.onload = function (event) {
+
+                    const preview =
+                        document.getElementById("profilePreview");
+
+                    const placeholder =
+                        document.getElementById("profilePlaceholder");
+
+
+                    if (preview) {
+                        preview.src = event.target.result;
+                        preview.style.display = "block";
+                    }
+
+
+                    if (placeholder) {
+                        placeholder.style.display = "none";
+                    }
+
+                };
+
+
+                reader.readAsDataURL(file);
+
+            }
+        );
+
+    }
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WeatherGPT | 7-Day Forecast</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+
+body{
+    font-family:Inter,Segoe UI,Arial,sans-serif;
+    min-height:100vh;
+    color:#f8fafc;
+    background:
+    radial-gradient(circle at 15% 10%,rgba(56,189,248,.14),transparent 30%),
+    radial-gradient(circle at 85% 85%,rgba(99,102,241,.13),transparent 32%),
+    #050914;
+}
+
+body:before,body:after{
+    content:"";
+    position:fixed;
+    width:320px;
+    height:320px;
+    border-radius:50%;
+    filter:blur(90px);
+    opacity:.16;
+    pointer-events:none;
+    z-index:-1;
+}
+
+body:before{
+    background:#38bdf8;
+    top:-130px;
+    left:25%;
+    animation:float 9s ease-in-out infinite;
+}
+
+body:after{
+    background:#6366f1;
+    right:-120px;
+    bottom:-120px;
+    animation:float 11s ease-in-out infinite reverse;
+}
+
+@keyframes float{
+    50%{transform:translateY(35px) translateX(20px)}
+}
+
+.layout{min-height:100vh}
+
+.sidebar{
+    position:fixed;
+    left:0;
+    top:0;
+    bottom:0;
+    width:245px;
+    padding:24px 15px;
+    background:rgba(5,10,23,.88);
+    border-right:1px solid rgba(255,255,255,.08);
+    backdrop-filter:blur(25px);
+    z-index:10;
+}
+
+.logo{
+    display:flex;
+    align-items:center;
+    gap:11px;
+    padding:7px 11px 30px;
+}
+
+.logo-mark{
+    width:43px;
+    height:43px;
+    border-radius:14px;
+    display:grid;
+    place-items:center;
+    font-weight:800;
+    font-size:20px;
+    background:linear-gradient(135deg,#0ea5e9,#6366f1);
+    box-shadow:0 10px 35px rgba(56,189,248,.25);
+}
+
+.logo b{
+    display:block;
+    font-size:17px;
+}
+
+.logo small{
+    display:block;
+    color:#65728a;
+    font-size:10px;
+    margin-top:3px;
+}
+
+.label{
+    color:#536078;
+    font-size:10px;
+    letter-spacing:1.5px;
+    padding:0 13px 10px;
+}
+
+.nav a{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:13px 14px;
+    margin:4px 0;
+    border-radius:12px;
+    color:#8996ad;
+    text-decoration:none;
+    font-size:13px;
+    transition:.25s;
+}
+
+.nav a:hover,
+.nav a.active{
+    color:#fff;
+    background:rgba(56,189,248,.09);
+    box-shadow:inset 3px 0 #38bdf8;
+}
+
+.icon{
+    width:20px;
+    text-align:center;
+}
+
+.main{
+    margin-left:245px;
+    padding:30px 40px 55px;
+}
+
+.header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:28px;
+}
+
+.header h1{
+    font-size:30px;
+    letter-spacing:-.8px;
+}
+
+.header p{
+    color:#8491a8;
+    font-size:13px;
+    margin-top:7px;
+}
+
+.live{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding:9px 14px;
+    border-radius:20px;
+    color:#86efac;
+    background:rgba(34,197,94,.07);
+    border:1px solid rgba(34,197,94,.16);
+    font-size:10px;
+    letter-spacing:.5px;
+}
+
+.live i{
+    width:7px;
+    height:7px;
+    border-radius:50%;
+    background:#4ade80;
+    box-shadow:0 0 12px #4ade80;
+}
+
+.search-card{
+    padding:24px;
+    border-radius:22px;
+    background:rgba(13,21,39,.72);
+    border:1px solid rgba(255,255,255,.08);
+    backdrop-filter:blur(20px);
+    margin-bottom:22px;
+}
+
+.search-card h2{
+    font-size:17px;
+}
+
+.search-card p{
+    color:#71809a;
+    font-size:12px;
+    margin:7px 0 18px;
+}
+
+.search-row{
+    display:flex;
+    gap:10px;
+}
+
+.search-row input{
+    flex:1;
+    height:48px;
+    padding:0 16px;
+    border-radius:13px;
+    border:1px solid rgba(255,255,255,.1);
+    outline:none;
+    background:rgba(2,6,23,.75);
+    color:white;
+    font-size:14px;
+}
+
+.search-row input:focus{
+    border-color:rgba(56,189,248,.55);
+    box-shadow:0 0 0 3px rgba(56,189,248,.07);
+}
+
+.search-row button{
+    height:48px;
+    padding:0 25px;
+    border:0;
+    border-radius:13px;
+    cursor:pointer;
+    color:white;
+    font-weight:700;
+    background:linear-gradient(135deg,#0ea5e9,#6366f1);
+    transition:.25s;
+}
+
+.search-row button:hover{
+    transform:translateY(-2px);
+    box-shadow:0 12px 28px rgba(56,189,248,.2);
+}
+
+.message{
+    display:none;
+    margin-top:12px;
+    padding:11px 13px;
+    border-radius:10px;
+    font-size:12px;
+}
+
+.loading{
+    color:#7dd3fc;
+    background:rgba(56,189,248,.06);
+    border:1px solid rgba(56,189,248,.12);
+}
+
+.error{
+    color:#fca5a5;
+    background:rgba(239,68,68,.08);
+    border:1px solid rgba(239,68,68,.15);
+}
+
+.location-card{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:22px 25px;
+    margin-bottom:20px;
+    border-radius:22px;
+    background:rgba(13,21,39,.72);
+    border:1px solid rgba(255,255,255,.08);
+    backdrop-filter:blur(20px);
+}
+
+.location-title{
+    color:#71809a;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:1px;
+}
+
+.location-name{
+    font-size:22px;
+    font-weight:700;
+    margin-top:5px;
+}
+
+.location-country{
+    color:#8491a8;
+    font-size:12px;
+    margin-top:3px;
+}
+
+.days{
+    display:grid;
+    grid-template-columns:repeat(7,1fr);
+    gap:12px;
+}
+
+.day{
+    min-height:245px;
+    padding:20px 15px;
+    border-radius:20px;
+    background:rgba(13,21,39,.7);
+    border:1px solid rgba(255,255,255,.07);
+    backdrop-filter:blur(18px);
+    text-align:center;
+    transition:.3s;
+}
+
+.day:hover{
+    transform:translateY(-6px);
+    border-color:rgba(56,189,248,.3);
+    box-shadow:0 18px 35px rgba(0,0,0,.25);
+}
+
+.day.today{
+    border-color:rgba(56,189,248,.4);
+    background:linear-gradient(
+        180deg,
+        rgba(56,189,248,.11),
+        rgba(13,21,39,.7)
+    );
+}
+
+.day-name{
+    font-size:13px;
+    font-weight:700;
+}
+
+.date{
+    color:#64748b;
+    font-size:10px;
+    margin-top:5px;
+}
+
+.weather-icon{
+    font-size:37px;
+    margin:20px 0 13px;
+    animation:bob 3s ease-in-out infinite;
+}
+
+@keyframes bob{
+    50%{transform:translateY(-5px)}
+}
+
+.condition{
+    color:#cbd5e1;
+    font-size:11px;
+    min-height:28px;
+}
+
+.temps{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:8px;
+    margin-top:17px;
+}
+
+.high{
+    font-size:18px;
+    font-weight:700;
+}
+
+.low{
+    color:#64748b;
+    font-size:14px;
+}
+
+.rain{
+    margin-top:13px;
+    color:#7dd3fc;
+    font-size:10px;
+}
+
+.wind{
+    margin-top:7px;
+    color:#8491a8;
+    font-size:10px;
+}
+
+.footer-note{
+    margin-top:20px;
+    text-align:center;
+    color:#536078;
+    font-size:10px;
+}
+
+@media(max-width:1100px){
+    .days{
+        grid-template-columns:repeat(4,1fr);
+    }
+}
+
+@media(max-width:850px){
+    .sidebar{
+        width:210px;
+    }
+
+    .main{
+        margin-left:210px;
+        padding:25px;
+    }
+
+    .days{
+        grid-template-columns:repeat(2,1fr);
+    }
+}
+
+@media(max-width:600px){
+    .sidebar{
+        position:relative;
+        width:100%;
+        height:auto;
+        padding:14px;
+    }
+
+    .layout{
+        display:block;
+    }
+
+    .nav{
+        display:flex;
+        overflow-x:auto;
+        gap:4px;
+    }
+
+    .nav a{
+        white-space:nowrap;
+    }
+
+    .label{
+        display:none;
+    }
+
+    .main{
+        margin-left:0;
+        padding:20px 14px 40px;
+    }
+
+    .header h1{
+        font-size:24px;
+    }
+
+    .live{
+        display:none;
+    }
+
+    .search-row{
+        flex-direction:column;
+    }
+
+    .search-row button{
+        width:100%;
+    }
+
+    .location-card{
+        align-items:flex-start;
+    }
+
+    .days{
+        grid-template-columns:1fr;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="layout">
+
+<aside class="sidebar">
+
+    <div class="logo">
+        <div class="logo-mark">W</div>
+        <div>
+            <b>WeatherGPT</b>
+            <small>AI WEATHER INTELLIGENCE</small>
+        </div>
+    </div>
+
+    <div class="label">Main Menu</div>
+
+    <nav class="nav">
+
+        <a href="/home/">
+            <span class="icon">⌂</span>
+            Home
+        </a>
+
+        <a href="/weather/">
+            <span class="icon">☁</span>
+            Weather
+        </a>
+
+        <a href="/forecast/" class="active">
+            <span class="icon">◈</span>
+            Forecast
+        </a>
+
+        <a href="/alerts/">
+            <span class="icon">!</span>
+            Alerts
+        </a>
+
+        <a href="/climate/">
+            <span class="icon">◌</span>
+            Climate
+        </a>
+
+        <a href="/chatbot/">
+            <span class="icon">✦</span>
+            AI Chatbot
+        </a>
+
+        <a href="/profile/">
+            <span class="icon">◎</span>
+            Profile
+        </a>
+
+        <a href="/logout/">
+            <span class="icon">↪</span>
+            Logout
+        </a>
+
+    </nav>
+
+</aside>
+
+
+<main class="main">
+
+<header class="header">
+
+    <div>
+        <h1>7-Day Forecast</h1>
+        <p>Plan ahead with intelligent weather forecasting</p>
+    </div>
+
+    <div class="live">
+        <i></i>
+        LIVE FORECAST DATA
+    </div>
+
+</header>
+
+
+<section class="search-card">
+
+    <h2>Search Forecast</h2>
+
+    <p>
+        Enter a city or location to view the upcoming 7-day forecast.
+    </p>
+
+    <div class="search-row">
+
+        <input
+            id="locationInput"
+            type="text"
+            placeholder="Enter city name... e.g. Guntur"
+            autocomplete="off"
+        >
+
+        <button onclick="searchForecast()">
+            Search Forecast
+        </button>
+
+    </div>
+
+    <div id="loading" class="message loading">
+        Fetching 7-day forecast...
+    </div>
+
+    <div id="error" class="message error"></div>
+
+</section>
+
+
+<section class="location-card">
+
+    <div>
+        <div class="location-title">Forecast Location</div>
+        <div class="location-name" id="city">
+            Guntur
+        </div>
+        <div class="location-country" id="country">
+            Search a location to load forecast
+        </div>
+    </div>
+
+    <div class="location-title">
+        NEXT 7 DAYS
+    </div>
+
+</section>
+
+
+<section class="days" id="forecastContainer">
+
+    <div class="day today">
+        <div class="day-name">Today</div>
+        <div class="date">--</div>
+        <div class="weather-icon">☁</div>
+        <div class="condition">
+            Search location
+        </div>
+
+        <div class="temps">
+            <span class="high">--°</span>
+            <span class="low">--°</span>
+        </div>
+
+        <div class="rain">
+            Rain --%
+        </div>
+
+        <div class="wind">
+            Wind -- km/h
+        </div>
+    </div>
+
+</section>
+
+
+<div class="footer-note">
+    Forecast data powered by WeatherGPT weather intelligence
+</div>
+
+</main>
+
+</div>
+
+
+<script>
+
+async function searchForecast(){
+
+    const input =
+        document.getElementById("locationInput");
+
+    const location =
+        input.value.trim();
+
+    const loading =
+        document.getElementById("loading");
+
+    const error =
+        document.getElementById("error");
+
+    if(!location){
+
+        showError(
+            "Please enter a city or location."
+        );
+
+        return;
+    }
+
+    loading.style.display = "block";
+    error.style.display = "none";
+
+    try{
+
+        const response = await fetch(
+            "/forecast/api/?location=" +
+            encodeURIComponent(location)
+        );
+
+        const data = await response.json();
+
+        if(!data.success){
+
+            throw new Error(
+                data.message ||
+                "Unable to fetch forecast data."
+            );
+        }
+
+        updateForecast(data);
+
+    }
+    catch(err){
+
+        showError(err.message);
+
+    }
+    finally{
+
+        loading.style.display = "none";
+
+    }
+}
+
+
+function updateForecast(data){
+
+    document.getElementById("city")
+        .textContent =
+        data.location.city;
+
+    document.getElementById("country")
+        .textContent =
+        data.location.country ||
+        "Forecast available";
+
+    const container =
+        document.getElementById(
+            "forecastContainer"
+        );
+
+    container.innerHTML = "";
+
+    data.forecast.forEach(
+        function(item,index){
+
+            const card =
+                document.createElement("div");
+
+            card.className =
+                "day" +
+                (index === 0 ? " today" : "");
+
+            const date =
+                new Date(item.date + "T00:00:00");
+
+            const dayName =
+                index === 0
+                ? "Today"
+                : date.toLocaleDateString(
+                    "en-US",
+                    {weekday:"short"}
+                );
+
+            const dateText =
+                date.toLocaleDateString(
+                    "en-US",
+                    {
+                        month:"short",
+                        day:"numeric"
+                    }
+                );
+
+            card.innerHTML = `
+
+                <div class="day-name">
+                    ${dayName}
+                </div>
+
+                <div class="date">
+                    ${dateText}
+                </div>
+
+                <div class="weather-icon">
+                    ${getWeatherIcon(
+                        item.weather_code
+                    )}
+                </div>
+
+                <div class="condition">
+                    ${item.condition || "Unknown"}
+                </div>
+
+                <div class="temps">
+
+                    <span class="high">
+                        ${item.max_temperature ?? "--"}°
+                    </span>
+
+                    <span class="low">
+                        ${item.min_temperature ?? "--"}°
+                    </span>
+
+                </div>
+
+                <div class="rain">
+                    Rain ${item.rain_probability ?? "--"}%
+                </div>
+
+                <div class="wind">
+                    Wind ${item.wind_speed ?? "--"} km/h
+                </div>
+
+            `;
+
+            container.appendChild(card);
+
+        }
+    );
+}
+
+
+function getWeatherIcon(code){
+
+    if(code === 0 || code === 1){
+        return "☀";
+    }
+
+    if(code === 2 || code === 3){
+        return "☁";
+    }
+
+    if(code >= 45 && code <= 48){
+        return "≋";
+    }
+
+    if(code >= 51 && code <= 67){
+        return "☂";
+    }
+
+    if(code >= 71 && code <= 86){
+        return "❄";
+    }
+
+    if(code >= 95){
+        return "⚡";
+    }
+
+    return "☁";
+}
+
+
+function showError(message){
+
+    const error =
+        document.getElementById("error");
+
+    error.textContent = message;
+    error.style.display = "block";
+}
+
+
+document
+    .getElementById("locationInput")
+    .addEventListener(
+        "keydown",
+        function(event){
+
+            if(event.key === "Enter"){
+                searchForecast();
+            }
+
+        }
+    );
+
+</script>
+
+</body>
+</html>

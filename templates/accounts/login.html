@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<title>WeatherGPT | Login</title>
+
+
+<style>
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+
+body {
+
+    min-height: 100vh;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    overflow: hidden;
+
+    color: white;
+
+    background:
+        radial-gradient(
+            circle at 20% 20%,
+            rgba(0,190,255,.25),
+            transparent 30%
+        ),
+
+        radial-gradient(
+            circle at 80% 80%,
+            rgba(100,80,255,.25),
+            transparent 30%
+        ),
+
+        linear-gradient(
+            135deg,
+            #061222,
+            #0b203d,
+            #050c18
+        );
+}
+
+
+/* Animated circles */
+
+.bg-circle {
+
+    position: fixed;
+
+    border-radius: 50%;
+
+    border: 1px solid rgba(255,255,255,.08);
+
+    animation: rotate 15s linear infinite;
+
+}
+
+
+.circle1 {
+
+    width: 500px;
+    height: 500px;
+
+    top: -250px;
+    left: -250px;
+}
+
+
+.circle2 {
+
+    width: 700px;
+    height: 700px;
+
+    right: -350px;
+    bottom: -350px;
+
+    animation-direction: reverse;
+
+}
+
+
+@keyframes rotate {
+
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+
+}
+
+
+/* Login Card */
+
+.login-card {
+
+    width: 420px;
+
+    padding: 45px;
+
+    background:
+        rgba(255,255,255,.08);
+
+    border:
+        1px solid rgba(255,255,255,.14);
+
+    backdrop-filter:
+        blur(25px);
+
+    border-radius: 30px;
+
+    box-shadow:
+        0 30px 80px rgba(0,0,0,.4);
+
+    animation:
+        appear .8s ease;
+
+}
+
+
+@keyframes appear {
+
+    from {
+
+        opacity: 0;
+
+        transform:
+            translateY(35px)
+            scale(.95);
+
+    }
+
+    to {
+
+        opacity: 1;
+
+        transform:
+            translateY(0)
+            scale(1);
+
+    }
+
+}
+
+
+/* Logo */
+
+.logo {
+
+    width: 75px;
+
+    height: 75px;
+
+    border-radius: 22px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #20c6ff,
+            #1769e0
+        );
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    font-size: 40px;
+
+    margin: auto;
+
+    box-shadow:
+        0 15px 40px
+        rgba(0,170,255,.3);
+
+    animation:
+        float 4s ease-in-out infinite;
+
+}
+
+
+@keyframes float {
+
+    0%,100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+
+}
+
+
+h1 {
+
+    text-align: center;
+
+    margin-top: 22px;
+
+    font-size: 32px;
+
+}
+
+
+.subtitle {
+
+    text-align: center;
+
+    color: #9eb2c7;
+
+    margin-top: 8px;
+
+    margin-bottom: 28px;
+
+}
+
+
+.message {
+
+    padding: 12px;
+
+    border-radius: 10px;
+
+    margin-bottom: 15px;
+
+    background:
+        rgba(255,80,80,.12);
+
+    color: #ffb0b0;
+
+    font-size: 13px;
+
+}
+
+
+/* Inputs */
+
+.field {
+
+    margin-bottom: 18px;
+
+}
+
+
+label {
+
+    display: block;
+
+    margin-bottom: 8px;
+
+    font-size: 13px;
+
+    color: #c8d8e8;
+
+}
+
+
+input {
+
+    width: 100%;
+
+    padding: 16px;
+
+    border-radius: 13px;
+
+    border:
+        1px solid rgba(255,255,255,.12);
+
+    background:
+        rgba(0,0,0,.22);
+
+    color: white;
+
+    outline: none;
+
+    transition: .3s;
+
+}
+
+
+input:focus {
+
+    border-color: #20bfff;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(32,191,255,.12);
+
+}
+
+
+input::placeholder {
+
+    color: #71869b;
+
+}
+
+
+/* Button */
+
+button {
+
+    width: 100%;
+
+    padding: 16px;
+
+    margin-top: 5px;
+
+    border: none;
+
+    border-radius: 14px;
+
+    cursor: pointer;
+
+    color: white;
+
+    font-size: 16px;
+
+    font-weight: bold;
+
+    background:
+        linear-gradient(
+            135deg,
+            #19c3ff,
+            #236be5
+        );
+
+    box-shadow:
+        0 12px 30px
+        rgba(23,145,255,.25);
+
+    transition: .3s;
+
+}
+
+
+button:hover {
+
+    transform: translateY(-3px);
+
+    box-shadow:
+        0 18px 35px
+        rgba(23,145,255,.35);
+
+}
+
+
+.signup {
+
+    text-align: center;
+
+    margin-top: 22px;
+
+    color: #9eb2c7;
+
+    font-size: 14px;
+
+}
+
+
+.signup a {
+
+    color: #25bfff;
+
+    font-weight: bold;
+
+    text-decoration: none;
+
+}
+
+
+@media(max-width:500px) {
+
+    .login-card {
+
+        width: calc(100% - 30px);
+
+        padding: 30px;
+
+    }
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div class="bg-circle circle1"></div>
+
+<div class="bg-circle circle2"></div>
+
+
+<div class="login-card">
+
+
+    <div class="logo">
+        🌦️
+    </div>
+
+
+    <h1>
+        Welcome Back
+    </h1>
+
+
+    <p class="subtitle">
+        Login to your WeatherGPT dashboard
+    </p>
+
+
+    {% if messages %}
+
+        {% for message in messages %}
+
+            <div class="message">
+                {{ message }}
+            </div>
+
+        {% endfor %}
+
+    {% endif %}
+
+
+    <form method="POST">
+
+        {% csrf_token %}
+
+
+        <div class="field">
+
+            <label>
+                Email Address
+            </label>
+
+            <input
+                type="email"
+                name="email"
+                placeholder="Enter your email"
+                required
+            >
+
+        </div>
+
+
+        <div class="field">
+
+            <label>
+                Password
+            </label>
+
+            <input
+                type="password"
+                name="password"
+                placeholder="Enter your password"
+                required
+            >
+
+        </div>
+
+
+        <button type="submit">
+
+            Login to WeatherGPT →
+
+        </button>
+
+
+    </form>
+
+
+    <div class="signup">
+
+        Don't have an account?
+
+        <a href="{% url 'signup' %}">
+            Create Account
+        </a>
+
+    </div>
+
+
+</div>
+
+
+</body>
+
+</html>
