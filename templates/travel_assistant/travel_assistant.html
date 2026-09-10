@@ -1,0 +1,597 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+    .travel-page {
+        min-height: 80vh;
+        padding: 30px;
+        background: #05070b;
+        color: #ffffff;
+    }
+
+    .travel-hero {
+        max-width: 950px;
+        margin: 0 auto 30px;
+        text-align: center;
+    }
+
+    .travel-hero h1 {
+        margin: 0 0 10px;
+        font-size: 38px;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+    }
+
+    .travel-hero p {
+        margin: 0;
+        color: #94a3b8;
+        font-size: 15px;
+    }
+
+    .travel-card {
+        max-width: 950px;
+        margin: auto;
+        padding: 30px;
+        border-radius: 24px;
+        background: #0b0f16;
+        border: 1px solid #1e293b;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+    }
+
+    .travel-form {
+        display: grid;
+        grid-template-columns: 1fr 240px auto;
+        gap: 14px;
+        align-items: end;
+    }
+
+    .field label {
+        display: block;
+        margin-bottom: 8px;
+        color: #cbd5e1;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .input-wrap {
+        position: relative;
+    }
+
+    .field input {
+        width: 100%;
+        height: 50px;
+        box-sizing: border-box;
+        padding: 0 15px;
+        border-radius: 13px;
+        border: 1px solid #263244;
+        background: #080b11;
+        color: #ffffff;
+        font-size: 14px;
+        outline: none;
+        transition: 0.2s ease;
+    }
+
+    .field input::placeholder {
+        color: #64748b;
+    }
+
+    .field input:focus {
+        border-color: #38bdf8;
+        box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.08);
+    }
+
+    /* Calendar icon */
+    input[type="date"] {
+        color-scheme: dark;
+    }
+
+    input[type="date"]::-webkit-calendar-picker-indicator {
+        cursor: pointer;
+        opacity: 0.9;
+        padding: 6px;
+    }
+
+    .check-btn {
+        height: 50px;
+        padding: 0 24px;
+        border: none;
+        border-radius: 13px;
+        background: #0ea5e9;
+        color: #ffffff;
+        font-size: 14px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: 0.2s ease;
+        white-space: nowrap;
+    }
+
+    .check-btn:hover {
+        background: #0284c7;
+        transform: translateY(-1px);
+    }
+
+    .check-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .message {
+        min-height: 22px;
+        margin-top: 18px;
+        text-align: center;
+        color: #fbbf24;
+        font-size: 14px;
+    }
+
+    .result {
+        display: none;
+        margin-top: 15px;
+    }
+
+    .result-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 15px;
+        flex-wrap: wrap;
+        margin-bottom: 20px;
+        padding-bottom: 18px;
+        border-bottom: 1px solid #1e293b;
+    }
+
+    .result-header h2 {
+        margin: 0 0 6px;
+        font-size: 25px;
+        font-weight: 750;
+    }
+
+    .result-header small {
+        color: #64748b;
+    }
+
+    .status {
+        padding: 9px 15px;
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .good {
+        background: rgba(34, 197, 94, 0.12);
+        color: #4ade80;
+        border: 1px solid rgba(34, 197, 94, 0.2);
+    }
+
+    .warning {
+        background: rgba(245, 158, 11, 0.12);
+        color: #fbbf24;
+        border: 1px solid rgba(245, 158, 11, 0.2);
+    }
+
+    .danger {
+        background: rgba(239, 68, 68, 0.12);
+        color: #f87171;
+        border: 1px solid rgba(239, 68, 68, 0.2);
+    }
+
+    .weather-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+    }
+
+    .metric {
+        padding: 19px;
+        border-radius: 16px;
+        background: #080c13;
+        border: 1px solid #1b2636;
+    }
+
+    .metric span {
+        display: block;
+        margin-bottom: 8px;
+        color: #64748b;
+        font-size: 12px;
+    }
+
+    .metric strong {
+        color: #f8fafc;
+        font-size: 17px;
+    }
+
+    .recommendation,
+    .packing {
+        margin-top: 16px;
+        padding: 21px;
+        border-radius: 17px;
+        background: #080c13;
+        border: 1px solid #1b2636;
+    }
+
+    .recommendation h3,
+    .packing h3 {
+        margin: 0 0 10px;
+        font-size: 16px;
+    }
+
+    .recommendation p {
+        margin: 0;
+        color: #cbd5e1;
+        line-height: 1.7;
+        font-size: 14px;
+    }
+
+    .packing-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 9px;
+    }
+
+    .pack-item {
+        padding: 8px 13px;
+        border-radius: 999px;
+        background: #0b1824;
+        border: 1px solid #164e63;
+        color: #7dd3fc;
+        font-size: 13px;
+    }
+
+    @media (max-width: 800px) {
+        .travel-page {
+            padding: 18px;
+        }
+
+        .travel-card {
+            padding: 20px;
+        }
+
+        .travel-form {
+            grid-template-columns: 1fr;
+        }
+
+        .check-btn {
+            width: 100%;
+        }
+
+        .weather-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 480px) {
+        .travel-hero h1 {
+            font-size: 28px;
+        }
+
+        .weather-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+
+<div class="travel-page">
+
+    <div class="travel-hero">
+        <h1>✈️ Smart Travel Assistant</h1>
+        <p>
+            Plan your journey using destination-based weather intelligence.
+        </p>
+    </div>
+
+
+    <div class="travel-card">
+
+        <form id="travelForm" class="travel-form">
+
+            <div class="field">
+                <label for="destination">Destination</label>
+
+                <div class="input-wrap">
+                    <input
+                        type="text"
+                        id="destination"
+                        placeholder="e.g. Hyderabad, Goa, Delhi"
+                        autocomplete="off"
+                        required
+                    >
+                </div>
+            </div>
+
+
+            <div class="field">
+                <label for="travelDate">Travel Date</label>
+
+                <div class="input-wrap">
+                    <input
+                        type="date"
+                        id="travelDate"
+                        required
+                    >
+                </div>
+            </div>
+
+
+            <button
+                class="check-btn"
+                id="checkBtn"
+                type="submit"
+            >
+                Check Trip
+            </button>
+
+        </form>
+
+
+        <div id="message" class="message"></div>
+
+
+        <div id="result" class="result">
+
+            <div class="result-header">
+
+                <div>
+                    <h2 id="location"></h2>
+                    <small id="date"></small>
+                </div>
+
+                <div id="status" class="status"></div>
+
+            </div>
+
+
+            <div class="weather-grid">
+
+                <div class="metric">
+                    <span>Weather</span>
+                    <strong id="condition">—</strong>
+                </div>
+
+                <div class="metric">
+                    <span>Temperature</span>
+                    <strong id="temperature">—</strong>
+                </div>
+
+                <div class="metric">
+                    <span>Rain Probability</span>
+                    <strong id="rain">—</strong>
+                </div>
+
+                <div class="metric">
+                    <span>Wind Speed</span>
+                    <strong id="wind">—</strong>
+                </div>
+
+            </div>
+
+
+            <div class="recommendation">
+
+                <h3>🧭 Travel Recommendation</h3>
+
+                <p id="recommendation"></p>
+
+            </div>
+
+
+            <div class="packing">
+
+                <h3>🎒 Smart Packing Suggestions</h3>
+
+                <div
+                    id="packing"
+                    class="packing-list"
+                ></div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+(function () {
+
+    const form = document.getElementById("travelForm");
+    const destinationInput = document.getElementById("destination");
+    const dateInput = document.getElementById("travelDate");
+    const message = document.getElementById("message");
+    const result = document.getElementById("result");
+    const checkBtn = document.getElementById("checkBtn");
+
+
+    /* Set minimum date to today */
+    const today = new Date();
+
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, "0");
+    const day = String(today.getDate()).padStart(2, "0");
+
+    dateInput.min = `${year}-${month}-${day}`;
+
+
+    /* Clicking the date field opens the calendar */
+    dateInput.addEventListener("click", function () {
+
+        if (typeof this.showPicker === "function") {
+            try {
+                this.showPicker();
+            } catch (error) {
+                /* Browser may already have opened the picker */
+            }
+        }
+
+    });
+
+
+    form.addEventListener("submit", async function (event) {
+
+        event.preventDefault();
+
+
+        const destination =
+            destinationInput.value.trim();
+
+        const travelDate =
+            dateInput.value;
+
+
+        if (!destination) {
+
+            message.textContent =
+                "Please enter a travel destination.";
+
+            destinationInput.focus();
+
+            return;
+        }
+
+
+        if (!travelDate) {
+
+            message.textContent =
+                "Please select a travel date.";
+
+            dateInput.focus();
+
+            return;
+        }
+
+
+        message.textContent =
+            "Checking destination weather...";
+
+        result.style.display = "none";
+
+        checkBtn.disabled = true;
+        checkBtn.textContent = "Checking...";
+
+
+        try {
+
+            const apiUrl =
+                "{% url 'travel_assistant_api' %}" +
+                "?destination=" +
+                encodeURIComponent(destination) +
+                "&travel_date=" +
+                encodeURIComponent(travelDate);
+
+
+            const response =
+                await fetch(apiUrl);
+
+
+            const data =
+                await response.json();
+
+
+            if (!data.success) {
+
+                message.textContent =
+                    data.message || "Unable to get travel information.";
+
+                return;
+            }
+
+
+            const weather =
+                data.data;
+
+
+            message.textContent = "";
+
+
+            document.getElementById("location").textContent =
+                "📍 " + weather.location;
+
+
+            document.getElementById("date").textContent =
+                "Travel date: " + weather.date;
+
+
+            document.getElementById("condition").textContent =
+                weather.condition;
+
+
+            document.getElementById("temperature").textContent =
+                weather.temperature_min +
+                "°C – " +
+                weather.temperature_max +
+                "°C";
+
+
+            document.getElementById("rain").textContent =
+                weather.rain_probability +
+                "%";
+
+
+            document.getElementById("wind").textContent =
+                weather.wind_speed +
+                " km/h";
+
+
+            document.getElementById("recommendation").textContent =
+                weather.recommendation;
+
+
+            const status =
+                document.getElementById("status");
+
+
+            status.textContent =
+                weather.travel_status;
+
+
+            status.className =
+                "status " + weather.travel_class;
+
+
+            const packing =
+                document.getElementById("packing");
+
+
+            packing.innerHTML = "";
+
+
+            weather.packing.forEach(function (item) {
+
+                const span =
+                    document.createElement("span");
+
+                span.className =
+                    "pack-item";
+
+                span.textContent =
+                    "✓ " + item;
+
+                packing.appendChild(span);
+
+            });
+
+
+            result.style.display = "block";
+
+
+        } catch (error) {
+
+            message.textContent =
+                "Unable to connect to the weather service. Please try again.";
+
+        } finally {
+
+            checkBtn.disabled = false;
+            checkBtn.textContent = "Check Trip";
+
+        }
+
+    });
+
+})();
+</script>
+
+{% endblock %}

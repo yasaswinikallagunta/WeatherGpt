@@ -1,0 +1,1000 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    background: #000 !important;
+    color: #fff !important;
+}
+
+.smart-campus-page {
+    min-height: 100vh;
+    padding: 35px;
+    background: #000;
+    color: #fff;
+    font-family: Arial, sans-serif;
+}
+
+.campus-header {
+    margin-bottom: 30px;
+}
+
+.campus-header h1 {
+    margin: 0 0 8px;
+    font-size: 36px;
+    font-weight: 700;
+    letter-spacing: -1px;
+}
+
+.campus-header p {
+    margin: 0;
+    color: #888;
+    font-size: 15px;
+}
+
+.campus-card {
+    background: #090909;
+    border: 1px solid #222;
+    border-radius: 20px;
+    padding: 25px;
+    margin-bottom: 22px;
+}
+
+.campus-card h2 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-size: 20px;
+    color: #fff;
+}
+
+.search-area {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.search-input {
+    flex: 1;
+    padding: 15px 16px;
+    background: #030303;
+    color: #fff;
+    border: 1px solid #292929;
+    border-radius: 11px;
+    outline: none;
+    font-size: 15px;
+}
+
+.search-input:focus {
+    border-color: #555;
+}
+
+.search-btn {
+    padding: 15px 24px;
+    background: #fff;
+    color: #000;
+    border: none;
+    border-radius: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.search-btn:hover {
+    background: #ddd;
+}
+
+.suggestions {
+    margin-top: 12px;
+    background: #080808;
+    border: 1px solid #222;
+    border-radius: 12px;
+    overflow: hidden;
+    display: none;
+}
+
+.suggestion-item {
+    padding: 14px 16px;
+    border-bottom: 1px solid #1d1d1d;
+    cursor: pointer;
+    color: #ccc;
+}
+
+.suggestion-item:last-child {
+    border-bottom: none;
+}
+
+.suggestion-item:hover {
+    background: #151515;
+    color: #fff;
+}
+
+.selected-location {
+    margin-top: 18px;
+    padding: 20px;
+    background: #050505;
+    border: 1px solid #252525;
+    border-radius: 15px;
+    display: none;
+}
+
+.selected-location h3 {
+    margin: 0 0 8px;
+    color: #fff;
+}
+
+.selected-location p {
+    margin: 6px 0;
+    color: #888;
+    font-size: 14px;
+}
+
+.coordinates {
+    margin-top: 12px;
+    color: #aaa;
+    font-size: 13px;
+}
+
+.analyze-btn {
+    margin-top: 15px;
+    padding: 13px 22px;
+    background: #fff;
+    color: #000;
+    border: none;
+    border-radius: 10px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.analyze-btn:hover {
+    background: #ddd;
+}
+
+.status {
+    margin-top: 15px;
+    color: #888;
+    font-size: 14px;
+}
+
+.loading {
+    text-align: center;
+    color: #aaa;
+    padding: 15px;
+}
+
+.metrics {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+}
+
+.metric {
+    background: #050505;
+    border: 1px solid #202020;
+    border-radius: 15px;
+    padding: 20px;
+}
+
+.metric-label {
+    color: #777;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .7px;
+}
+
+.metric-value {
+    margin-top: 9px;
+    color: #fff;
+    font-size: 25px;
+    font-weight: 700;
+}
+
+.recommendation {
+    padding: 16px;
+    margin-top: 10px;
+    background: #050505;
+    border: 1px solid #222;
+    border-radius: 12px;
+    color: #ccc;
+    line-height: 1.5;
+}
+
+.forecast-row {
+    display: grid;
+    grid-template-columns: 100px 1fr 1fr;
+    gap: 15px;
+    align-items: center;
+    padding: 16px;
+    margin-top: 10px;
+    background: #050505;
+    border: 1px solid #202020;
+    border-radius: 12px;
+    color: #ccc;
+}
+
+.hidden {
+    display: none !important;
+}
+
+@media (max-width: 900px) {
+
+    .metrics {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .search-area {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .search-btn {
+        width: 100%;
+    }
+
+    .forecast-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 600px) {
+
+    .smart-campus-page {
+        padding: 20px;
+    }
+
+    .campus-header h1 {
+        font-size: 28px;
+    }
+
+    .metrics {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+
+<div class="smart-campus-page">
+
+    <!-- HEADER -->
+
+    <div class="campus-header">
+
+        <h1>🏫 Smart Campus</h1>
+
+        <p>
+            Weather-powered intelligence for smarter campus
+            activities, events and outdoor planning.
+        </p>
+
+    </div>
+
+
+    <!-- LOCATION SEARCH -->
+
+    <div class="campus-card">
+
+        <h2>📍 Search Campus Location</h2>
+
+        <div class="search-area">
+
+            <input
+                type="text"
+                id="campusLocation"
+                class="search-input"
+                placeholder="Search campus, city, town or village..."
+                autocomplete="off"
+            >
+
+            <button
+                class="search-btn"
+                onclick="searchCampusLocation()"
+            >
+                Search Location
+            </button>
+
+        </div>
+
+
+        <!-- SEARCH SUGGESTIONS -->
+
+        <div
+            id="suggestions"
+            class="suggestions"
+        ></div>
+
+
+        <!-- STATUS -->
+
+        <div
+            id="searchStatus"
+            class="status"
+        ></div>
+
+
+        <!-- SELECTED LOCATION -->
+
+        <div
+            id="selectedLocationBox"
+            class="selected-location"
+        >
+
+            <h3 id="selectedLocationName">
+                --
+            </h3>
+
+            <p id="selectedLocationDetails">
+                --
+            </p>
+
+            <div class="coordinates">
+
+                Latitude:
+                <strong id="latitude">
+                    --
+                </strong>
+
+                &nbsp;&nbsp; | &nbsp;&nbsp;
+
+                Longitude:
+                <strong id="longitude">
+                    --
+                </strong>
+
+            </div>
+
+
+            <button
+                class="analyze-btn"
+                onclick="checkCampusWeather()"
+            >
+                Analyze Campus Weather →
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- LOADING -->
+
+    <div
+        id="loading"
+        class="campus-card hidden"
+    >
+
+        <div class="loading">
+            ⏳ Analyzing campus weather conditions...
+        </div>
+
+    </div>
+
+
+    <!-- RESULTS -->
+
+    <div
+        id="results"
+        class="hidden"
+    >
+
+
+        <!-- CURRENT CONDITIONS -->
+
+        <div class="campus-card">
+
+            <h2>
+                🌦️ Current Campus Conditions
+            </h2>
+
+
+            <div class="metrics">
+
+
+                <div class="metric">
+
+                    <div class="metric-label">
+                        Temperature
+                    </div>
+
+                    <div
+                        id="temperature"
+                        class="metric-value"
+                    >
+                        --
+                    </div>
+
+                </div>
+
+
+                <div class="metric">
+
+                    <div class="metric-label">
+                        Feels Like
+                    </div>
+
+                    <div
+                        id="feelsLike"
+                        class="metric-value"
+                    >
+                        --
+                    </div>
+
+                </div>
+
+
+                <div class="metric">
+
+                    <div class="metric-label">
+                        Humidity
+                    </div>
+
+                    <div
+                        id="humidity"
+                        class="metric-value"
+                    >
+                        --
+                    </div>
+
+                </div>
+
+
+                <div class="metric">
+
+                    <div class="metric-label">
+                        Wind Speed
+                    </div>
+
+                    <div
+                        id="wind"
+                        class="metric-value"
+                    >
+                        --
+                    </div>
+
+                </div>
+
+
+                <div class="metric">
+
+                    <div class="metric-label">
+                        Rain Probability
+                    </div>
+
+                    <div
+                        id="rain"
+                        class="metric-value"
+                    >
+                        --
+                    </div>
+
+                </div>
+
+
+                <div class="metric">
+
+                    <div class="metric-label">
+                        Precipitation
+                    </div>
+
+                    <div
+                        id="precipitation"
+                        class="metric-value"
+                    >
+                        --
+                    </div>
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+
+        <!-- SMART RECOMMENDATIONS -->
+
+        <div class="campus-card">
+
+            <h2>
+                🤖 Smart Campus Recommendations
+            </h2>
+
+            <div id="recommendations"></div>
+
+        </div>
+
+
+        <!-- 3 DAY FORECAST -->
+
+        <div class="campus-card">
+
+            <h2>
+                📅 3-Day Campus Forecast
+            </h2>
+
+            <div id="forecast"></div>
+
+        </div>
+
+
+    </div>
+
+</div>
+
+
+<script>
+
+/* ==========================================
+   GLOBAL LOCATION DATA
+========================================== */
+
+let selectedLatitude = null;
+let selectedLongitude = null;
+let selectedLocation = null;
+
+
+/* ==========================================
+   SEARCH CAMPUS LOCATION
+========================================== */
+
+async function searchCampusLocation() {
+
+    const input =
+        document.getElementById("campusLocation");
+
+    const query =
+        input.value.trim();
+
+    const suggestions =
+        document.getElementById("suggestions");
+
+    const status =
+        document.getElementById("searchStatus");
+
+    if (!query) {
+
+        status.textContent =
+            "Please enter a campus or location.";
+
+        suggestions.style.display = "none";
+
+        return;
+    }
+
+
+    status.textContent =
+        "Searching location...";
+
+    suggestions.style.display =
+        "none";
+
+
+    try {
+
+        const url =
+            "https://geocoding-api.open-meteo.com/v1/search"
+            + "?name="
+            + encodeURIComponent(query)
+            + "&count=8"
+            + "&language=en"
+            + "&format=json";
+
+
+        const response =
+            await fetch(url);
+
+
+        const data =
+            await response.json();
+
+
+        if (
+            !data.results ||
+            data.results.length === 0
+        ) {
+
+            status.textContent =
+                "Location not found. Try another name.";
+
+            return;
+        }
+
+
+        suggestions.innerHTML = "";
+
+
+        data.results.forEach(location => {
+
+            const item =
+                document.createElement("div");
+
+            item.className =
+                "suggestion-item";
+
+
+            const country =
+                location.country || "";
+
+            const admin =
+                location.admin1 || "";
+
+            const place =
+                location.name || "";
+
+
+            item.textContent =
+                place
+                + (admin ? ", " + admin : "")
+                + (country ? ", " + country : "");
+
+
+            item.onclick =
+                function() {
+
+                    selectCampusLocation(location);
+
+                };
+
+
+            suggestions.appendChild(item);
+
+        });
+
+
+        suggestions.style.display =
+            "block";
+
+
+        status.textContent =
+            "Select your campus location from the results.";
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        status.textContent =
+            "Unable to search location.";
+
+    }
+
+}
+
+
+/* ==========================================
+   SELECT LOCATION
+========================================== */
+
+function selectCampusLocation(location) {
+
+    selectedLatitude =
+        location.latitude;
+
+    selectedLongitude =
+        location.longitude;
+
+    selectedLocation =
+        location.name;
+
+
+    document.getElementById(
+        "campusLocation"
+    ).value =
+        location.name;
+
+
+    document.getElementById(
+        "selectedLocationName"
+    ).textContent =
+        "📍 " + location.name;
+
+
+    document.getElementById(
+        "selectedLocationDetails"
+    ).textContent =
+        (
+            location.admin1
+            ? location.admin1 + ", "
+            : ""
+        )
+        +
+        (
+            location.country
+            || ""
+        );
+
+
+    document.getElementById(
+        "latitude"
+    ).textContent =
+        selectedLatitude.toFixed(6);
+
+
+    document.getElementById(
+        "longitude"
+    ).textContent =
+        selectedLongitude.toFixed(6);
+
+
+    document.getElementById(
+        "selectedLocationBox"
+    ).style.display =
+        "block";
+
+
+    document.getElementById(
+        "suggestions"
+    ).style.display =
+        "none";
+
+
+    document.getElementById(
+        "searchStatus"
+    ).textContent =
+        "Location selected successfully.";
+
+
+    document.getElementById(
+        "results"
+    ).classList.add("hidden");
+
+}
+
+
+/* ==========================================
+   CHECK CAMPUS WEATHER
+========================================== */
+
+async function checkCampusWeather() {
+
+    if (
+        selectedLatitude === null ||
+        selectedLongitude === null
+    ) {
+
+        alert(
+            "Please search and select a campus location first."
+        );
+
+        return;
+    }
+
+
+    document.getElementById(
+        "loading"
+    ).classList.remove("hidden");
+
+
+    document.getElementById(
+        "results"
+    ).classList.add("hidden");
+
+
+    try {
+
+        const url =
+            "/smart-campus/api/"
+            + "?latitude="
+            + encodeURIComponent(selectedLatitude)
+            + "&longitude="
+            + encodeURIComponent(selectedLongitude);
+
+
+        const response =
+            await fetch(url);
+
+
+        const data =
+            await response.json();
+
+
+        if (!data.success) {
+
+            alert(
+                data.error
+                || "Unable to fetch campus weather."
+            );
+
+            return;
+        }
+
+
+        /* CURRENT WEATHER */
+
+        document.getElementById(
+            "temperature"
+        ).textContent =
+            `${data.temperature}°C`;
+
+
+        document.getElementById(
+            "feelsLike"
+        ).textContent =
+            `${data.feels_like}°C`;
+
+
+        document.getElementById(
+            "humidity"
+        ).textContent =
+            `${data.humidity}%`;
+
+
+        document.getElementById(
+            "wind"
+        ).textContent =
+            `${data.wind_speed} km/h`;
+
+
+        document.getElementById(
+            "rain"
+        ).textContent =
+            `${data.rain_probability}%`;
+
+
+        document.getElementById(
+            "precipitation"
+        ).textContent =
+            `${data.precipitation} mm`;
+
+
+        /* SMART RECOMMENDATIONS */
+
+        const recommendations =
+            document.getElementById(
+                "recommendations"
+            );
+
+
+        recommendations.innerHTML = "";
+
+
+        if (
+            data.recommendations &&
+            data.recommendations.length
+        ) {
+
+            data.recommendations.forEach(
+                recommendation => {
+
+                    const item =
+                        document.createElement("div");
+
+
+                    item.className =
+                        "recommendation";
+
+
+                    item.textContent =
+                        "• " + recommendation;
+
+
+                    recommendations.appendChild(item);
+
+                }
+            );
+
+        }
+
+
+        /* 3 DAY FORECAST */
+
+        const forecast =
+            document.getElementById(
+                "forecast"
+            );
+
+
+        forecast.innerHTML = "";
+
+
+        const maxTemps =
+            data.forecast.max_temperature || [];
+
+
+        const minTemps =
+            data.forecast.min_temperature || [];
+
+
+        const rainProb =
+            data.forecast.rain_probability || [];
+
+
+        for (
+            let i = 0;
+            i < maxTemps.length;
+            i++
+        ) {
+
+            const row =
+                document.createElement("div");
+
+
+            row.className =
+                "forecast-row";
+
+
+            row.innerHTML = `
+
+                <strong>
+                    Day ${i + 1}
+                </strong>
+
+                <span>
+                    🌡️
+                    ${minTemps[i]}°C
+                    –
+                    ${maxTemps[i]}°C
+                </span>
+
+                <span>
+                    🌧️
+                    ${rainProb[i]}%
+                    rain probability
+                </span>
+
+            `;
+
+
+            forecast.appendChild(row);
+
+        }
+
+
+        document.getElementById(
+            "results"
+        ).classList.remove("hidden");
+
+
+        document.getElementById(
+            "results"
+        ).scrollIntoView({
+            behavior: "smooth",
+            block: "start"
+        });
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert(
+            "Unable to connect to Smart Campus weather service."
+        );
+
+    } finally {
+
+        document.getElementById(
+            "loading"
+        ).classList.add("hidden");
+
+    }
+
+}
+
+
+/* ==========================================
+   ENTER KEY SEARCH
+========================================== */
+
+document
+    .getElementById("campusLocation")
+    .addEventListener(
+        "keydown",
+        function(event) {
+
+            if (event.key === "Enter") {
+
+                searchCampusLocation();
+
+            }
+
+        }
+    );
+
+
+</script>
+
+{% endblock %}

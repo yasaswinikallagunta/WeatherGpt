@@ -25,8 +25,11 @@ SECRET_KEY = 'django-insecure-=po8b^+_m%)a1rt@%&+knb2j91565o69^8_)nl!^&noyh40a8(
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
+import os
 
+OPENWEATHER_API_KEY = os.environ.get("OPENWEATHER_API_KEY", "")
+WEATHERAPI_KEY = os.environ.get("WEATHERAPI_KEY", "")
 
 # Application definition
 
@@ -42,6 +45,8 @@ INSTALLED_APPS = [
     'chatbot',
     'forecast',
     'farmer_assistant',
+    'travel_assistant',
+    'smart_campus',
     'alerts',
     'climate',
     'locations',

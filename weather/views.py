@@ -6,6 +6,8 @@ from urllib.error import HTTPError, URLError
 from django.shortcuts import render
 from django.http import JsonResponse
 from django.views.decorators.http import require_GET
+from .openweather import get_openweather
+from .weatherapi import get_weatherapi
 
 
 def weather_page(request):
@@ -228,3 +230,18 @@ def get_weather_condition(code):
         code,
         "Unknown Weather"
     )
+def openweather_test(request):
+    city = request.GET.get("city", "Ongole").strip()
+
+    data = get_openweather(city)
+
+    return JsonResponse(data)
+def weatherapi_test(request):
+    city = request.GET.get("city", "").strip()
+
+    if not city:
+        city = "Ongole"
+
+    data = get_weatherapi(city)
+
+    return JsonResponse(data)

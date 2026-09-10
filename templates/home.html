@@ -1232,7 +1232,10 @@ body:before{
     </div>
 
     <div class="farmer-content">
-        <span class="farmer-label">WEATHERGPT FARMER ASSISTANT</span>
+
+        <span class="farmer-label">
+            WEATHERGPT FARMER ASSISTANT
+        </span>
 
         <h2>Smart Weather Guidance for Farmers</h2>
 
@@ -1244,11 +1247,93 @@ body:before{
         <a href="/farmer-assistant/" class="farmer-btn">
             Open Farmer Assistant →
         </a>
+
     </div>
 
 </div>
-<section class="dashboard">
 
+
+<!-- SMART TRAVEL ASSISTANT -->
+
+<div style="
+    margin-top:20px;
+    padding:25px;
+    border-radius:20px;
+    background:#0a0a0a;
+    border:1px solid #222;
+">
+
+    <h2 style="
+        color:#fff;
+        margin-top:0;
+    ">
+        ✈️ Smart Travel Assistant
+    </h2>
+
+    <p style="color:#888;">
+        Plan your trip with destination-based weather intelligence.
+    </p>
+
+    <a href="{% url 'travel_assistant' %}"
+       style="
+       display:inline-block;
+       margin-top:10px;
+       padding:12px 20px;
+       border-radius:10px;
+       background:#da1818;
+       color:#fff;
+       border:1px solid #444;
+       text-decoration:none;
+       font-weight:700;
+       ">
+        Open Travel Assistant →
+    </a>
+
+</div>
+
+
+<!-- SMART CAMPUS -->
+
+<div style="
+    margin-top:20px;
+    padding:25px;
+    border-radius:20px;
+    background:#ccdd47;
+    border:1px solid #222;
+">
+
+    <h2 style="
+        color:#fff;
+        margin-top:0;
+    ">
+        🏫 Smart Campus
+    </h2>
+
+    <p style="color:#888;">
+        Weather intelligence for smarter campus activities,
+        events and outdoor planning.
+    </p>
+
+    <a href="{% url 'smart_campus' %}"
+       style="
+       display:inline-block;
+       margin-top:10px;
+       padding:12px 20px;
+       border-radius:10px;
+       background:#0a0a0a;
+       color:#fff;
+       border:1px solid #444;
+       text-decoration:none;
+       font-weight:700;
+       ">
+        Open Smart Campus →
+    </a>
+
+</div>
+
+</section>
+
+<section class="dashboard">
     <!-- WEATHER CARD -->
     <div class="card weather-card">
 

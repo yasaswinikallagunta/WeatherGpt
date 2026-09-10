@@ -825,6 +825,70 @@
                 </div>
 
             </div>
+            <div class="weather-card" id="openweather-card">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div>
+            <h2>🌐 OpenWeather</h2>
+            <p>Real-time weather data from OpenWeather API</p>
+        </div>
+
+        <span style="
+            padding:8px 14px;
+            border-radius:20px;
+            background:rgba(14,165,233,0.15);
+            color:#38bdf8;
+            font-size:13px;
+            font-weight:600;
+        ">
+            LIVE SOURCE
+        </span>
+    </div>
+
+    <div id="openweather-result" style="margin-top:20px;">
+        Search a location to view OpenWeather data.
+    </div>
+</div>
+<!-- WEATHERAPI SOURCE -->
+
+<div class="weather-card" id="weatherapi-card">
+
+    <div style="
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        gap:15px;
+    ">
+
+        <div>
+            <h2>☁️ WeatherAPI</h2>
+
+            <p>
+                Real-time weather data from WeatherAPI
+            </p>
+        </div>
+
+        <span style="
+            padding:8px 14px;
+            border-radius:20px;
+            background:#111;
+            border:1px solid #333;
+            color:#fff;
+            font-size:12px;
+            font-weight:600;
+        ">
+            WEATHER SOURCE
+        </span>
+
+    </div>
+
+    <div
+        id="weatherapi-result"
+        style="margin-top:20px;"
+    >
+        Search a location to view WeatherAPI data.
+    </div>
+
+</div>
 
         </div>
 
@@ -952,6 +1016,165 @@
     }
 
 }
+async function loadOpenWeather(city) {
+    const result = document.getElementById("openweather-result");
+
+    if (!result) return;
+
+    result.innerHTML = "Loading OpenWeather data...";
+
+    try {
+        const response = await fetch(
+            `/weather/openweather-test/?city=${encodeURIComponent(city)}`
+        );
+
+        const data = await response.json();
+
+        if (!data.success) {
+    result.innerHTML = `
+        <p style="color:#f87171;">
+            ${data.error || "Unable to load OpenWeather data."}
+        </p>
+    `;
+    return;
+}
+
+        result.innerHTML = `
+            <div style="
+                display:grid;
+                grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+                gap:15px;
+            ">
+                <div>
+                    <small>LOCATION</small>
+                    <h3>${data.city}, ${data.country}</h3>
+                </div>
+
+                <div>
+                    <small>TEMPERATURE</small>
+                    <h3>${data.temperature}°C</h3>
+                </div>
+
+                <div>
+                    <small>FEELS LIKE</small>
+                    <h3>${data.feels_like}°C</h3>
+                </div>
+
+                <div>
+                    <small>HUMIDITY</small>
+                    <h3>${data.humidity}%</h3>
+                </div>
+
+                <div>
+                    <small>WIND</small>
+                    <h3>${data.wind_speed} m/s</h3>
+                </div>
+
+                <div>
+                    <small>CONDITION</small>
+                    <h3>${data.condition}</h3>
+                </div>
+            </div>
+        `;
+
+    } catch (error) {
+        console.error("OpenWeather Error:", error);
+
+        result.innerHTML = `
+            <p style="color:#f87171;">
+                OpenWeather connection failed.
+            </p>
+        `;
+    }
+}
+async function loadWeatherAPI(city) {
+
+    const result = document.getElementById("weatherapi-result");
+
+    if (!result) return;
+
+    result.innerHTML = "Loading WeatherAPI data...";
+
+    try {
+
+        const response = await fetch(
+            `/weather/weatherapi-test/?city=${encodeURIComponent(city)}`
+        );
+
+        const data = await response.json();
+
+        if (!data.success) {
+
+            result.innerHTML = `
+                <p style="color:#aaa;">
+                    ${data.error || "Unable to load WeatherAPI data."}
+                </p>
+            `;
+
+            return;
+        }
+
+        result.innerHTML = `
+            <div style="
+                display:grid;
+                grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+                gap:15px;
+            ">
+
+                <div>
+                    <small>LOCATION</small>
+                    <h3>${data.city}, ${data.country}</h3>
+                </div>
+
+                <div>
+                    <small>TEMPERATURE</small>
+                    <h3>${data.temperature}°C</h3>
+                </div>
+
+                <div>
+                    <small>FEELS LIKE</small>
+                    <h3>${data.feels_like}°C</h3>
+                </div>
+
+                <div>
+                    <small>HUMIDITY</small>
+                    <h3>${data.humidity}%</h3>
+                </div>
+
+                <div>
+                    <small>WIND</small>
+                    <h3>${data.wind_speed} km/h</h3>
+                </div>
+
+                <div>
+                    <small>CONDITION</small>
+                    <h3>${data.condition}</h3>
+                </div>
+
+                <div>
+                    <small>PRESSURE</small>
+                    <h3>${data.pressure} mb</h3>
+                </div>
+
+                <div>
+                    <small>VISIBILITY</small>
+                    <h3>${data.visibility} km</h3>
+                </div>
+
+            </div>
+        `;
+
+    } catch (error) {
+
+        console.error("WeatherAPI Error:", error);
+
+        result.innerHTML = `
+            <p style="color:#aaa;">
+                WeatherAPI connection failed.
+            </p>
+        `;
+    }
+}
 /* --------------------------------
        SEARCH WEATHER
     -------------------------------- */
@@ -995,6 +1218,8 @@
             }
 
             displayWeather(data);
+            loadOpenWeather(location);
+            loadWeatherAPI(location);
 
             showStatus(
                 "Weather updated successfully.",
@@ -1554,7 +1779,67 @@
             .classList.toggle("open");
 
     }
+async function loadOpenWeather(city) {
+    if (!city) return;
 
+    const result = document.getElementById("openweather-result");
+
+    result.innerHTML = "Loading OpenWeather data...";
+
+    try {
+        const response = await fetch(
+            `/weather/openweather-test/?city=${encodeURIComponent(city)}`
+        );
+
+        const data = await response.json();
+
+        if (!data.success) {
+            result.innerHTML = "Unable to load OpenWeather data.";
+            return;
+        }
+
+        result.innerHTML = `
+            <div style="
+                display:grid;
+                grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+                gap:15px;
+            ">
+                <div>
+                    <small>Location</small>
+                    <h3>${data.city}, ${data.country}</h3>
+                </div>
+
+                <div>
+                    <small>Temperature</small>
+                    <h3>${data.temperature}°C</h3>
+                </div>
+
+                <div>
+                    <small>Feels Like</small>
+                    <h3>${data.feels_like}°C</h3>
+                </div>
+
+                <div>
+                    <small>Humidity</small>
+                    <h3>${data.humidity}%</h3>
+                </div>
+
+                <div>
+                    <small>Wind</small>
+                    <h3>${data.wind_speed} m/s</h3>
+                </div>
+
+                <div>
+                    <small>Condition</small>
+                    <h3>${data.condition}</h3>
+                </div>
+            </div>
+        `;
+
+    } catch (error) {
+        result.innerHTML = "OpenWeather connection failed.";
+    }
+}
 </script>
 
 </body>
